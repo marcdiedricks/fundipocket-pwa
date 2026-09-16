@@ -552,24 +552,42 @@
 
     initLandingTheme();
 
-    /* FORM SUBMISSION & RELATIVE FILE ROUTING */
+    /* FORM SUBMISSION: LOCAL CACHE + BACKGROUND DISPATCH TO solutions.marcd@gmail.com */
     function handlePilotSubmission(event) {
       event.preventDefault();
       const name = document.getElementById('studentName').value.trim();
       const contact = document.getElementById('studentContact').value.trim();
       const faculty = document.getElementById('studentFaculty').value;
+      const timestamp = new Date().toLocaleString("en-ZA");
 
+      // 1. Keep transparent local record on student device
       const existingLeads = JSON.parse(localStorage.getItem('fundipocket_leads') || '[]');
-      existingLeads.push({
-        name,
-        contact,
-        faculty,
-        timestamp: new Date().toISOString()
-      });
+      existingLeads.push({ name, contact, faculty, timestamp });
       localStorage.setItem('fundipocket_leads', JSON.stringify(existingLeads));
 
-      // Direct handoff to your sibling index.html file
-      window.location.href = './index.html';
+      // 2. Silent background dispatch to solutions.marcd@gmail.com
+      fetch("https://formsubmit.co/ajax/solutions.marcd@gmail.com", {
+        method: "POST",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `New FundiPocket Student Lead: ${name} (${faculty})`,
+          Student_Name: name,
+          Contact_Number_or_Email: contact,
+          Faculty_Trade: faculty,
+          Submission_Time: timestamp,
+          _captcha: "false"
+        })
+      })
+      .then(() => {
+        window.location.href = './index.html';
+      })
+      .catch(() => {
+        // Fallback: If device is offline during scan, allow immediate entry to PWA
+        window.location.href = './index.html';
+      });
     }
   </script>
 </body>
