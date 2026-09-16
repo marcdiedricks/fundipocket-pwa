@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FundiPocket — Zero-Data Tertiary Study & Lecture Capture</title>
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    /* DYNAMIC THEME PALETTE */
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-alt: #0b1329;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --highlight: #38bdf8;
+      --tag-bg: rgba(16, 185, 129, 0.15);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-alt: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --input-bg: #ffffff;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --highlight: #0284c7;
+      --tag-bg: rgba(5, 150, 105, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; transition: background 0.2s ease, color 0.2s ease; line-height: 1.5; }
+    .container { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; }
+
+    /* HEADER & SWITCHERS */
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap; }
+    .brand h1 { font-size: 1.4rem; color: var(--accent); font-weight: 800; letter-spacing: -0.5px; }
+    .brand p { font-size: 0.74rem; color: var(--text-muted); }
+    
+    .header-controls { display: flex; align-items: center; gap: 8px; }
+
+    /* MULTILINGUAL PILL BAR */
+    .lang-pills {
+      display: flex;
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px;
+    }
+    .lang-pill {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .lang-pill.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .theme-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--tag-bg);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 16px;
+      border: 1px solid var(--accent);
+    }
+    .hero-title { font-size: 1.45rem; font-weight: 800; line-height: 1.25; }
+    .hero-desc { font-size: 0.88rem; color: var(--text-muted); }
+
+    /* FUNDI DEFINITION BANNER */
+    .definition-box {
+      background: var(--card-alt);
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.78rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .definition-box strong { color: var(--accent); }
+
+    /* 4 PILLARS */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .item {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .item-icon { font-size: 1.15rem; }
+    .item-title { font-weight: 700; font-size: 0.82rem; color: var(--text); }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; }
+
+    /* FORM */
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .popia-box {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      line-height: 1.35;
+    }
+    .popia-box input[type="checkbox"] { width: auto; margin-top: 2px; cursor: pointer; }
+
+    .btn-launch {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .btn-launch:hover { background: var(--accent-hover); }
+
+    /* FOUNDER / MENTOR CARD */
+    .mentor-card {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mentor-header { display: flex; justify-content: space-between; align-items: baseline; }
+    .mentor-name { font-weight: 800; color: var(--accent); font-size: 0.92rem; }
+    .mentor-role { font-size: 0.75rem; color: var(--text-muted); }
+    .mentor-links { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; }
+    .contact-link {
+      color: var(--highlight);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .contact-link:hover { text-decoration: underline; }
+
+    footer { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header>
+      <div class="brand">
+        <h1>FundiPocket</h1>
+        <p id="t_sub">Zero-Data Tertiary Study Toolkit</p>
+      </div>
+      <div class="header-controls">
+        <div class="lang-pills">
+          <button class="lang-pill active" onclick="setLang('en')">EN</button>
+          <button class="lang-pill" onclick="setLang('af')">AF</button>
+          <button class="lang-pill" onclick="setLang('xh')">XH</button>
+          <button class="lang-pill" onclick="setLang('zu')">ZU</button>
+        </div>
+        <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="card">
+      <div class="hero-badge" id="t_badge">⚡ 100% Offline • Zero Data Required</div>
+      <h2 class="hero-title" id="t_hero_title">Never Miss a Lecture Formula or Whiteboard Slide Again.</h2>
+      <p class="hero-desc" id="t_hero_desc">
+        Designed for South African university, TVET, and college students. Capture chalkboard photos, record audio summaries, and revise offline with zero data.
+      </p>
+      
+      <!-- FUNDI EXPLANATION BOX -->
+      <div class="definition-box" id="t_definition">
+        <strong>What is a Fundi?</strong> In South African culture, a <em>Fundi</em> is an expert, a master craftsman, or the one with practical know-how. FundiPocket puts that mastery right in your pocket.
+      </div>
+    </section>
+
+    <!-- 4 FEATURE PILLARS -->
+    <div class="grid">
+      <div class="item">
+        <span class="item-icon">📷</span>
+        <span class="item-title" id="t_p1_t">44KB Whiteboard Snaps</span>
+        <span class="item-desc" id="t_p1_d">Turns chalkboard glare into high-contrast readable text cards.</span>
+      </div>
+      <div class="item">
+        <span class="item-icon">🎙️</span>
+        <span class="item-title" id="t_p2_t">16kbps Voice Capture</span>
+        <span class="item-desc" id="t_p2_d">Compact voice notes store a 10-minute lecture in ~1MB.</span>
+      </div>
+      <div class="item">
+        <span class="item-icon">🔄</span>
+        <span class="item-title" id="t_p3_t">Bluetooth / P2P Share</span>
+        <span class="item-desc" id="t_p3_d">Beam complete lesson bundles to classmates with zero internet data.</span>
+      </div>
+      <div class="item">
+        <span class="item-icon">📖</span>
+        <span class="item-title" id="t_p4_t">Exam Study Reader</span>
+        <span class="item-desc" id="t_p4_d">Fullscreen study mode with instant subject and keyword search.</span>
+      </div>
+    </div>
+
+    <!-- STUDENT PILOT INTAKE (POPIA COMPLIANT) -->
+    <section class="card">
+      <h2 style="font-size: 1.15rem;" id="t_pilot_title">Join the Campus Pilot Cohort</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted);" id="t_pilot_desc">
+        Sign up below to activate access, receive study templates, and test peer-to-peer lesson sharing on your campus.
+      </p>
+
+      <form onsubmit="handleSubmit(event)">
+        <div class="input-group">
+          <label for="sName" id="t_lbl_name">First & Last Name</label>
+          <input type="text" id="sName" placeholder="e.g. Sipho Ndlovu" required>
+        </div>
+
+        <div class="input-group" style="margin-top: 10px;">
+          <label for="sContact" id="t_lbl_contact">WhatsApp Number or Email Address</label>
+          <input type="text" id="sContact" placeholder="e.g. 082 123 4567 or student@campus.ac.za" required>
+        </div>
+
+        <div class="input-group" style="margin-top: 10px;">
+          <label for="sFaculty" id="t_lbl_faculty">Faculty / Field of Study</label>
+          <select id="sFaculty">
+            <option value="Engineering & Built Environment">Engineering & Built Environment</option>
+            <option value="Law & Legal Studies">Law & Legal Studies</option>
+            <option value="Commerce & Management">Commerce & Management</option>
+            <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+            <option value="Health Sciences">Health Sciences</option>
+            <option value="Science & Technology">Science & Technology</option>
+            <option value="Artisan & TVET Trade Theory">Artisan & TVET Trade Theory</option>
+            <option value="General Studies">General Studies</option>
+          </select>
+        </div>
+
+        <div class="popia-box" style="margin-top: 14px; margin-bottom: 14px;">
+          <input type="checkbox" id="popia" required>
+          <label for="popia" id="t_popia" style="font-size: 0.72rem; font-weight: normal;">
+            <strong>🔒 Strictly Purpose-Bound:</strong> Your contact details are collected strictly for direct study support, pilot feedback, and tools by Marc Diedricks. Never sold, never shared with third parties.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-launch" id="t_btn_launch" style="width: 100%;">
+          🚀 Launch Free Offline App
+        </button>
+      </form>
+    </section>
+
+    <!-- FOUNDER & MENTOR DIRECT CARD -->
+    <section class="mentor-card">
+      <div class="mentor-header">
+        <div class="mentor-name">Marc Diedricks</div>
+        <div class="mentor-role" id="t_mentor_role">Practical Problem Solver & Systems Builder</div>
+      </div>
+      <p style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.4;" id="t_mentor_text">
+        Stuck with exam formulas, study methods, or technical trade bottlenecks? Reach out directly for guidance, custom tools, or pilot feedback.
+      </p>
+      <div class="mentor-links">
+        <a href="https://wa.me/27820000000?text=Hi%20Marc,%20I'm%20using%20FundiPocket%20and%20need%20assistance%20with..." target="_blank" class="contact-link">
+          💬 WhatsApp Marc
+        </a>
+        <a href="mailto:solutions.marcd@gmail.com?subject=FundiPocket%20Support%20&%20Mentorship" class="contact-link">
+          ✉️ solutions.marcd@gmail.com
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      FundiPocket • Engineered for South African Tertiary & TVET Realities • Zero Data Cost
+    </footer>
+  </div>
+
+  <script>
+    /* 4-LANGUAGE TRANSLATION DICTIONARY */
+    const translations = {
+      en: {
+        sub: "Zero-Data Tertiary Study Toolkit",
+        badge: "⚡ 100% Offline • Zero Data Required",
+        hero_title: "Never Miss a Lecture Formula or Whiteboard Slide Again.",
+        hero_desc: "Designed for South African university, TVET, and college students. Capture chalkboard photos, record audio summaries, and revise offline with zero data.",
+        definition: "<strong>What is a Fundi?</strong> In South African culture, a <em>Fundi</em> is an expert, a master craftsman, or the one with practical know-how. FundiPocket puts that mastery right in your pocket.",
+        p1_t: "44KB Whiteboard Snaps",
+        p1_d: "Turns chalkboard glare into high-contrast readable text cards.",
+        p2_t: "16kbps Voice Capture",
+        p2_d: "Compact voice notes store a 10-minute lecture in ~1MB.",
+        p3_t: "Bluetooth / P2P Share",
+        p3_d: "Beam complete lesson bundles to classmates with zero internet data.",
+        p4_t: "Exam Study Reader",
+        p4_d: "Fullscreen study mode with instant subject and keyword search.",
+        pilot_title: "Join the Campus Pilot Cohort",
+        pilot_desc: "Sign up below to activate access, receive study templates, and test peer-to-peer lesson sharing on your campus.",
+        lbl_name: "First & Last Name",
+        lbl_contact: "WhatsApp Number or Email Address",
+        lbl_faculty: "Faculty / Field of Study",
+        popia: "<strong>🔒 Strictly Purpose-Bound:</strong> Your contact details are collected strictly for direct study support, pilot feedback, and tools by Marc Diedricks. Never sold, never shared with third parties.",
+        btn_launch: "🚀 Launch Free Offline App",
+        mentor_role: "Practical Problem Solver & Systems Builder",
+        mentor_text: "Stuck with exam formulas, study methods, or technical trade bottlenecks? Reach out directly for guidance, custom tools, or pilot feedback."
+      },
+      af: {
+        sub: "Nul-Data Tersiêre Studiegereedskap",
+        badge: "⚡ 100% Vanlyn • Geen Data Nodig",
+        hero_title: "Moet Nooit Weer 'n Bordformule of Lesing Misloop Nie.",
+        hero_desc: "Ontwerp vir Suid-Afrikaanse universiteits-, TVET- en kollegestudente. Neem bordfoto's, neem stemopsommings op, en leer sonder enige mobiele data.",
+        definition: "<strong>Wat is 'n Fundi?</strong> In ons kultuur is 'n <em>Fundi</em> 'n kenner, 'n meester of iemand met praktiese kundigheid. FundiPocket sit daardie kennis reg in jou sak.",
+        p1_t: "44KB Bordkiekies",
+        p1_d: "Verander swartbordweerkaatsing in skerp, leesbare tekskaarte.",
+        p2_t: "16kbps Stemvaslegging",
+        p2_d: "Kompakte stemnotas bêre 'n 10-minute lesing in ongeveer 1MB.",
+        p3_t: "Bluetooth / P2P Deel",
+        p3_d: "Stuur volledige lesbundels na klasmaats sonder internetdata.",
+        p4_t: "Eksamen-Studieleser",
+        p4_d: "Volskerm studiemodus met kitssoektog volgens vak of sleutelwoord.",
+        pilot_title: "Sluit aan by die Kampustoetsprojek",
+        pilot_desc: "Teken hieronder in om volle toegang te kry, studiegidse te ontvang, en lêerdeling op kampus te toets.",
+        lbl_name: "Voor- en Van",
+        lbl_contact: "WhatsApp-nommer of E-posadres",
+        lbl_faculty: "Fakulteit / Studierigting",
+        popia: "<strong>🔒 Streng Doelgebonde:</strong> Jou besonderhede word slegs gebruik vir direkte studiehulp, projekterugvoer en gereedskap deur Marc Diedricks. Geen strooipos, geen verkoop nie.",
+        btn_launch: "🚀 Maak Vanlyn Toep Oop",
+        mentor_role: "Praktiese Probleemoplosser & Stelselbouer",
+        mentor_text: "Sit jy vas met eksamenformules, studiemetodes of tegniese uitdagings? Kontak my direk vir leiding en praktiese gereedskap."
+      },
+      xh: {
+        sub: "Izixhobo Zokufunda ZaseYunivesithi Ezingasebenzisi Datha",
+        badge: "⚡ 100% Ngaphandle Kwe-intanethi • Zero Data",
+        hero_title: "Ungaze Uphinde Uphoswe Zizifundo Okanye Iifomula ZeKlasi.",
+        hero_desc: "Yenzelwe abafundi baseyunivesithi, e-TVET naseekholeji zaseMzantsi Afrika. Fota iibhodi zokubhala, rekhoda izifundo, ufunde ngaphandle kwedatha.",
+        definition: "<strong>Yintoni i-Fundi?</strong> Ngokwenkcubeko yethu yaseMzantsi Afrika, <em>iFundi</em> yingcali okanye umntu onobuchule obupheleleyo. I-FundiPocket ibeka obo buchule epokothweni yakho.",
+        p1_t: "Iifoto Zebhodi Ze-44KB",
+        p1_d: "Yenza iibhodi ezibhalwe ngetshokhwe zicace bhabhe zibe ngamakhadi afundekayo.",
+        p2_t: "Ukurekhoda Ilizwi Nge-16kbps",
+        p2_d: "Ingxelo yelizwi yemizuzu eli-10 igcinwa kwi-1MB nje kuphela.",
+        p3_t: "Yabelana Nge-Bluetooth / P2P",
+        p3_d: "Thumela izifundo kwabo ufunda nabo ngaphandle kokusebenzisa idatha ye-intanethi.",
+        p4_t: "Umfundi Wovavanyo",
+        p4_d: "Indlela yokufundela iimviwo enokukhangela izihloko ngokukhawuleza.",
+        pilot_title: "Joyina iQela Lovavanyo LweKhampasi",
+        pilot_desc: "Faka iinkcukacha zakho apha ngezantsi ukuze uqalise, ufumane izikhokelo zokufunda, kwaye uvavanye ukwabelana ngezifundo.",
+        lbl_name: "Igama Nefani",
+        lbl_contact: "Inombolo ye-WhatsApp okanye i-Email",
+        lbl_faculty: "Icandelo Lezifundo",
+        popia: "<strong>🔒 Ukhuseleko Lweenkcukacha:</strong> Iinkcukacha zakho ziqokelelwa kuphela ukunceda kwizifundo nangezixhobo ezenziwe ngu-Marc Diedricks. Azisoze zithengiswe.",
+        btn_launch: "🚀 Vula i-App Engasebenzisi Datha",
+        mentor_role: "Umsombululi Weengxaki Zokwenyani & Umakhi Wezixhobo",
+        mentor_text: "Ngaba unengxaki ngeefomula zeemviwo okanye izifundo zakho zecandelo lwezandla? Qhagamshelana nam ngqo ufumane uncedo."
+      },
+      zu: {
+        sub: "Ithuluzi Lokufunda Elingasebenzisi Idatha LaseNyuvesi",
+        badge: "⚡ 100% Ngaphandle Kwe-inthanethi • Akukho Datha Edingekayo",
+        hero_title: "Ungaphinde Uphuthelwe Amabhodi Ezifundo Noma Amafomula.",
+        hero_desc: "Yakhelwe abafundi basenyuvesi, e-TVET nasemakolishi aseNingizimu Afrika. Thatha izithombe zebhodi, rekhoda izifundo, ufunde ngaphandle kwedatha.",
+        definition: "<strong>Kuyini i-Fundi?</strong> Esikweni lakithi laseNingizimu Afrika, <em>iFundi</em> ngumpetha noma umuntu onekhono elijulile. I-FundiPocket ibeka lobo buchwepheshe ephaketheni lakho.",
+        p1_t: "Izithombe Zebhodi Ze-44KB",
+        p1_d: "Yenza amabhodi e-chalk acace kahle abe ngamakhadi afundeka kalula.",
+        p2_t: "Ukuqopha Izwi Nge-16kbps",
+        p2_d: "Isifundo semizuzu eyi-10 sigcinwa ku-1MB kuphela.",
+        p3_t: "Yabelana Nge-Bluetooth / P2P",
+        p3_d: "Thumelela ofunda nabo izifundo eziphelele ngaphandle kokusebenzisa idatha.",
+        p4_t: "Isifundi Sezivivinyo",
+        p4_d: "Funda ngokugcwele esikrinini ngokusesha izifundo ngokushesha.",
+        pilot_title: "Joyina Iqembu Lovivinyo LwaseKhempasi",
+        pilot_desc: "Faka imininingwane yakho ngezansi ukuze uthole amathuluzi okufunda futhi uvivinye ukwabelana ngezifundo.",
+        lbl_name: "Igama Nesibongo",
+        lbl_contact: "Inombolo ye-WhatsApp noma i-Email",
+        lbl_faculty: "Umkhakha Wezifundo",
+        popia: "<strong>🔒 Ukuvikelwa Kwemininingwane:</strong> Imininingwane yakho isetshenziselwa kuphela ukukusiza ezifundweni nasezintweni ezenziwe ngu-Marc Diedricks. Ayithengiswa neze.",
+        btn_launch: "🚀 Vula i-App Engasebenzisi Idatha",
+        mentor_role: "Umsombululi Wezinkinga Zangempela & Umakhi Wezinhlelo",
+        mentor_text: "Ingabe unenkinga ngamafomula okufunda noma ngezifundo zokusebenza ngezandla? Xhumana nami ngqo ukuze uthole usizo."
+      }
+    };
+
+    /* INSTANT LANGUAGE SWITCHER */
+    function setLang(lang) {
+      document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.lang-pill')).find(b => b.textContent.trim().toLowerCase() === lang);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const t = translations[lang] || translations.en;
+      document.getElementById('t_sub').innerText = t.sub;
+      document.getElementById('t_badge').innerText = t.badge;
+      document.getElementById('t_hero_title').innerText = t.hero_title;
+      document.getElementById('t_hero_desc').innerText = t.hero_desc;
+      document.getElementById('t_definition').innerHTML = t.definition;
+      document.getElementById('t_p1_t').innerText = t.p1_t;
+      document.getElementById('t_p1_d').innerText = t.p1_d;
+      document.getElementById('t_p2_t').innerText = t.p2_t;
+      document.getElementById('t_p2_d').innerText = t.p2_d;
+      document.getElementById('t_p3_t').innerText = t.p3_t;
+      document.getElementById('t_p3_d').innerText = t.p3_d;
+      document.getElementById('t_p4_t').innerText = t.p4_t;
+      document.getElementById('t_p4_d').innerText = t.p4_d;
+      document.getElementById('t_pilot_title').innerText = t.pilot_title;
+      document.getElementById('t_pilot_desc').innerText = t.pilot_desc;
+      document.getElementById('t_lbl_name').innerText = t.lbl_name;
+      document.getElementById('t_lbl_contact').innerText = t.lbl_contact;
+      document.getElementById('t_lbl_faculty').innerText = t.lbl_faculty;
+      document.getElementById('t_popia').innerHTML = t.popia;
+      document.getElementById('t_btn_launch').innerText = t.btn_launch;
+      document.getElementById('t_mentor_role').innerText = t.mentor_role;
+      document.getElementById('t_mentor_text').innerText = t.mentor_text;
+
+      localStorage.setItem('fundi_landing_lang', lang);
+    }
+
+    /* THEME TOGGLE */
+    function initTheme() {
+      const saved = localStorage.getItem('fundi_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('fundi_theme', next);
+      document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
+    }
+
+    /* SUBMIT & REDIRECT TO PWA */
+    function handleSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('sName').value.trim();
+      const contact = document.getElementById('sContact').value.trim();
+      const faculty = document.getElementById('sFaculty').value;
+
+      const leads = JSON.parse(localStorage.getItem('fundipocket_leads') || '[]');
+      leads.push({ name, contact, faculty, date: new Date().toISOString() });
+      localStorage.setItem('fundipocket_leads', JSON.stringify(leads));
+
+      // Direct handoff to the live app
+      window.location.href = "https://fundipocket.marcdiedricks.workers.dev";
+    }
+
+    // Initialize defaults
+    initTheme();
+    const savedLang = localStorage.getItem('fundi_landing_lang') || 'en';
+    setLang(savedLang);
+  </script>
+</body>
+</html>
