@@ -2,721 +2,561 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FundiPocket — Offline Student Toolkit</title>
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
-  <link rel="manifest" href="./manifest.json">
-  <title>FundiPocket - Tertiary Offline Study Toolkit</title>
   <style>
+    /* DYNAMIC THEME PALETTES */
     :root {
       --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #10b981;
-      --danger: #ef4444;
-      --share: #8b5cf6;
-      --import: #0284c7;
-      --study: #2563eb;
+      --card-bg: #1e293b;
+      --card-alt: #0b1329;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --highlight: #2563eb;
+      --danger: #ef4444;
+      --modal-bg: #0b1120;
     }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-alt: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --input-bg: #ffffff;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --highlight: #1d4ed8;
+      --danger: #dc2626;
+      --modal-bg: #ffffff;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
-    header { margin-bottom: 16px; }
-    h1 { font-size: 1.3rem; color: var(--accent); }
-    p.sub { font-size: 0.8rem; color: var(--text-muted); }
+    body { background: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; transition: background 0.2s ease, color 0.2s ease; }
+    .container { width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 16px; }
 
-    .card { background: var(--card); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+    /* HEADER */
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .brand h1 { font-size: 1.4rem; color: var(--accent); font-weight: 800; }
+    .brand p { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .theme-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* TELEMETRY & IMPORT */
+    .telemetry-card {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-quota { color: var(--accent); font-weight: 700; }
+
+    .import-btn-label {
+      background: var(--highlight);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      display: block;
+    }
+
+    /* CARDS & INPUTS */
+    .card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card h2 { font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 100%; padding: 12px; margin-top: 8px; border: none; border-radius: 6px;
-      font-size: 0.95rem; font-weight: 600; cursor: pointer; color: white; background: #3b82f6;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
     }
-    .btn-record { background: var(--danger); }
-    .btn-record.recording { background: #b91c1c; animation: pulse 1.5s infinite; }
-    .btn-save { background: var(--accent); }
-    .btn-study { background: var(--study); font-size: 0.9rem; padding: 10px; margin-top: 10px; }
-    .btn-share { background: var(--share); font-size: 0.82rem; padding: 8px; }
-    .btn-download { background: var(--import); font-size: 0.82rem; padding: 8px; }
-    .btn-delete { background: #334155; color: #f87171; font-size: 0.82rem; padding: 8px; border: 1px solid #475569; }
-    .btn-delete:hover { background: #451a1a; }
-    .btn-import { background: var(--import); margin-top: 4px; padding: 10px; font-size: 0.88rem; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+    .btn-photo { background: #475569; color: white; }
+    .btn-audio { background: #b91c1c; color: white; }
+    .btn-audio.recording { background: #ef4444; animation: pulse 1.2s infinite; }
+    .btn-save { background: var(--accent); color: white; width: 100%; padding: 12px; font-size: 0.95rem; }
+    .btn-save:hover { background: var(--accent-hover); }
 
-    input[type="text"], select, textarea {
-      width: 100%; background: #0f172a; border: 1px solid #334155; color: var(--text);
-      padding: 10px; border-radius: 6px; margin-top: 6px; font-size: 0.9rem;
+    /* LESSON CARDS */
+    .lesson-card {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .hidden { display: none !important; }
-    .stat-badge { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block; }
-    
-    .photo-grid { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; padding-bottom: 4px; }
-    .photo-thumb-container { position: relative; flex-shrink: 0; width: 85px; height: 110px; border-radius: 6px; overflow: hidden; border: 1px solid #475569; }
-    .photo-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
-    .photo-badge { position: absolute; bottom: 2px; right: 4px; font-size: 0.65rem; background: rgba(0,0,0,0.7); color: #fff; padding: 2px 4px; border-radius: 3px; }
-    
-    .lesson-item { border-left: 3px solid var(--accent); padding: 12px; margin-bottom: 14px; background: #162032; border-radius: 0 6px 6px 0; }
-    .lesson-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .lesson-subject-pill { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; background: #334155; color: #38bdf8; border-radius: 12px; margin-bottom: 4px; }
-    .lesson-title { font-weight: 600; font-size: 1rem; margin-top: 2px; }
-    .lesson-meta { font-size: 0.75rem; color: var(--text-muted); }
-    audio { width: 100%; height: 36px; margin-top: 8px; }
+    .lesson-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
+    .faculty-tag { background: #0284c7; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 0.7rem; }
+    .lesson-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .lesson-actions { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .btn-action { padding: 6px 8px; font-size: 0.75rem; border-radius: 4px; border: none; font-weight: 600; cursor: pointer; text-align: center; }
+    .btn-read { background: var(--accent); color: white; }
+    .btn-share { background: #8b5cf6; color: white; }
+    .btn-download { background: var(--highlight); color: white; }
+    .btn-delete { background: #334155; color: #fca5a5; }
 
     /* FULLSCREEN STUDY MODAL */
     #studyModal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%;
-      background: #0f172a; z-index: 99999;
-      display: flex; flex-direction: column; padding: 16px; overflow-y: auto;
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--modal-bg);
+      z-index: 99999;
+      padding: 20px 16px;
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 16px;
     }
-    .study-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 12px; }
-    .study-close-btn { background: #334155; color: #f8fafc; border: 1px solid #475569; border-radius: 6px; padding: 8px 16px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
-    .study-slide-viewer { margin-top: 16px; display: flex; flex-direction: column; gap: 14px; }
-    .study-slide-viewer img { width: 100%; border-radius: 8px; border: 1px solid #334155; }
-    .study-notes-box { background: #1e293b; border-radius: 8px; padding: 14px; margin-top: 14px; font-size: 0.95rem; line-height: 1.5; color: #f8fafc; border-left: 4px solid #38bdf8; }
+    #studyModal.open { display: flex; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .modal-close { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>FundiPocket Capture</h1>
-    <p class="sub">Tertiary Student Offline Knowledge Toolkit • Standalone Edition</p>
-    <span id="storageStatus" class="stat-badge">Storage: Calculating...</span>
-  </header>
+  <div class="container">
+    <!-- HEADER WITH THEME SWITCH -->
+    <header>
+      <div class="brand">
+        <h1>FundiPocket</h1>
+        <p>Offline Tertiary Knowledge Hub • Zero-Data PWA</p>
+      </div>
+      <button class="theme-btn" id="themeToggleBtn" onclick="toggleAppTheme()">
+        🌙 Dark
+      </button>
+    </header>
 
-  <!-- QUICK PEER IMPORT -->
-  <section class="card" style="border: 1px dashed #38bdf8; background: #0b192e;">
-    <label class="btn btn-import">
+    <!-- STORAGE TELEMETRY & IMPORT -->
+    <div class="telemetry-card">
+      <div>Storage Pool: <span class="badge-quota" id="storageUsage">0.0 MB</span></div>
+      <div>Safe Quota: <span class="badge-quota" id="storageQuota">10240 MB</span></div>
+    </div>
+
+    <label class="import-btn-label">
       📥 Import Shared Lesson (.html)
-      <input type="file" id="importInput" accept=".html,text/html" class="hidden" />
+      <input type="file" accept=".html,text/html" id="importFileInput" style="display:none;" onchange="importSharedLesson(event)">
     </label>
-    <span class="stat-badge" style="text-align: center; margin-top: 4px;">Received lecture notes via Bluetooth or Quick Share? Tap to add to your library.</span>
-  </section>
 
-  <!-- CAPTURE WORKSPACE -->
-  <section class="card">
-    <label style="font-size: 0.85rem; font-weight: 600;">Faculty / Department</label>
-    <select id="lessonSubject">
-      <option value="General Studies">General Studies</option>
-      <option value="Science & Technology">Science & Technology</option>
-      <option value="Engineering & Built Environment">Engineering & Built Environment</option>
-      <option value="Commerce & Management">Commerce & Management</option>
-      <option value="Law & Legal Studies">Law & Legal Studies</option>
-      <option value="Health Sciences & Medicine">Health Sciences & Medicine</option>
-      <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
-      <option value="Custom">Other / Custom Course</option>
-    </select>
-    <input type="text" id="customSubjectInput" class="hidden" placeholder="Enter Course / Faculty Name..." />
-
-    <label style="font-size: 0.85rem; font-weight: 600; margin-top: 10px; display: block;">Topic / Lecture Title</label>
-    <input type="text" id="lessonTopic" placeholder="e.g. Constitutional Law: Chapter 2 Bill of Rights" />
-
-    <div style="margin-top: 12px;">
-      <label class="btn" style="background: #334155;">
-        📷 Snap Whiteboard / Slide (<span id="photoCount">0</span>/5)
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" />
-      </label>
-      <div id="photoPreviewGrid" class="photo-grid"></div>
-      <span id="imageStats" class="stat-badge"></span>
-    </div>
-
-    <div style="margin-top: 12px;">
-      <button id="recordBtn" class="btn btn-record">🎤 Record Lecturer (Max 10m)</button>
-      <span id="audioTimer" class="stat-badge">Status: Idle</span>
-      <audio id="audioPreview" controls class="hidden"></audio>
-      <span id="audioStats" class="stat-badge"></span>
-    </div>
-
-    <div style="margin-top: 12px;">
-      <textarea id="lessonNotes" rows="3" placeholder="Key takeaways, textbook cross-references, or exam formulas..."></textarea>
-    </div>
-
-    <button id="saveLessonBtn" class="btn btn-save" style="margin-top: 14px;">💾 Save Lesson Offline</button>
-  </section>
-
-  <!-- SAVED LESSONS ARCHIVE -->
-  <section class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <h2 style="font-size: 1rem;">Saved Lessons</h2>
-      <select id="filterSubject" style="width: 50%; padding: 6px 8px; font-size: 0.8rem; margin: 0;">
-        <option value="ALL">All Faculties</option>
+    <!-- CAPTURE FORM -->
+    <section class="card">
+      <h2>✍️ Capture Lecture Unit</h2>
+      
+      <select id="facultySelect">
+        <option value="General Studies">General Studies / All Faculties</option>
+        <option value="Engineering & Built Environment">Engineering & Built Environment</option>
+        <option value="Law & Legal Studies">Law & Legal Studies</option>
+        <option value="Commerce & Management">Commerce & Management</option>
+        <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+        <option value="Health Sciences">Health Sciences</option>
+        <option value="Science & Technology">Science & Technology</option>
       </select>
-    </div>
-    <input type="text" id="searchInput" placeholder="🔍 Search topic, note, or lecture..." style="margin-top: 4px; margin-bottom: 12px; padding: 8px 10px; font-size: 0.85rem;" />
-    
-    <div id="lessonsContainer">Loading lessons...</div>
-  </section>
+
+      <input type="text" id="lessonTitle" placeholder="Lecture Topic / Code (e.g. Contract Law 101)">
+      <textarea id="lessonNotes" placeholder="Key formulas, whiteboard summary, or lecturer notes..."></textarea>
+
+      <div class="btn-grid">
+        <label class="btn btn-photo">
+          📷 Snap Slide/Board
+          <input type="file" accept="image/*" capture="environment" id="photoCaptureInput" style="display:none;" onchange="handlePhotoCapture(event)">
+        </label>
+        <button class="btn btn-audio" id="audioRecordBtn" onclick="toggleAudioRecording()">
+          🎙️ Record Audio
+        </button>
+      </div>
+
+      <div id="captureSummary" style="font-size:0.75rem; color:var(--text-muted);">
+        Photos queued: <span id="photoCountBadge">0</span> | Audio: <span id="audioStatusBadge">None</span>
+      </div>
+
+      <button class="btn btn-save" onclick="saveActiveLesson()">💾 Save Lesson to Local Library</button>
+    </section>
+
+    <!-- SAVED LESSONS & SEARCH -->
+    <section class="card">
+      <h2>📚 Saved Lessons Library</h2>
+      <input type="text" id="searchInput" placeholder="🔍 Search topic, formula, or faculty..." oninput="filterLessons()">
+      <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
+        <!-- Dynamic Cards -->
+      </div>
+    </section>
+  </div>
 
   <!-- FULLSCREEN STUDY READER MODAL -->
-  <div id="studyModal" class="hidden">
-    <div class="study-header">
-      <div>
-        <span id="studyFacultyBadge" class="lesson-subject-pill">Faculty</span>
-        <h2 id="studyTitle" style="font-size: 1.15rem; margin-top: 4px; color:#10b981;">Lecture Title</h2>
-        <span id="studyMeta" class="lesson-meta">Captured Date</span>
-      </div>
-      <button class="study-close-btn" onclick="closeStudyModal()">✕ Close</button>
+  <div id="studyModal">
+    <div class="modal-header">
+      <span class="faculty-tag" id="modalFaculty">Faculty</span>
+      <button class="modal-close" onclick="closeStudyModal()">✕ Close</button>
     </div>
-    
-    <div id="studyAudioContainer" style="margin-top: 14px;"></div>
-    
-    <div id="studyNotesBox" class="study-notes-box hidden"></div>
-
-    <div id="studySlidesContainer" class="study-slide-viewer"></div>
+    <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Lecture Title</h1>
+    <div style="font-size:0.8rem; color:var(--text-muted);" id="modalDate">Captured Date</div>
+    <div id="modalAudioSection"></div>
+    <div class="card" style="margin-top:8px;">
+      <h3 style="font-size:0.95rem; color:var(--accent);">Whiteboard Slides</h3>
+      <div id="modalImagesContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:0.95rem; color:var(--accent);">Notes & Formulas</h3>
+      <p id="modalNotesText" style="font-size:0.95rem; line-height:1.6; white-space:pre-wrap;"></p>
+    </div>
   </div>
-
-  <canvas id="compressorCanvas" class="hidden"></canvas>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('SW registered:', reg.scope))
-          .catch((err) => console.error('SW failed:', err));
-      });
+    /* THEME SWITCHER ENGINE */
+    function initTheme() {
+      const saved = localStorage.getItem('fundi_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeButtonLabel(saved);
     }
+    function toggleAppTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('fundi_theme', next);
+      updateThemeButtonLabel(next);
+    }
+    function updateThemeButtonLabel(theme) {
+      const btn = document.getElementById('themeToggleBtn');
+      if (!btn) return;
+      btn.innerHTML = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+    initTheme();
 
+    /* INDEXEDDB STORAGE */
     let db;
-    const DB_NAME = 'FundiPocketDB';
-    const DB_VERSION = 2;
+    let queuedPhotos = [];
+    let recordedAudioBlob = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let allLessonsCache = [];
 
-    function initDB() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, DB_VERSION);
-        req.onupgradeneeded = (e) => {
-          const dbInstance = e.target.result;
-          if (!dbInstance.objectStoreNames.contains('lessons')) {
-            dbInstance.createObjectStore('lessons', { keyPath: 'id', autoIncrement: true });
-          }
-        };
-        req.onsuccess = (e) => { db = e.target.result; resolve(db); };
-        req.onerror = (e) => reject(e);
-      });
-    }
+    const dbReq = indexedDB.open("FundiPocketDB", 2);
+    dbReq.onupgradeneeded = (e) => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains("lessons")) {
+        db.createObjectStore("lessons", { keyPath: "id", autoIncrement: true });
+      }
+    };
+    dbReq.onsuccess = (e) => {
+      db = e.target.result;
+      refreshTelemetry();
+      loadLessons();
+    };
 
-    async function updateStorageStats() {
-      const statusEl = document.getElementById('storageStatus');
+    /* STORAGE ESTIMATION */
+    async function refreshTelemetry() {
       if (navigator.storage && navigator.storage.estimate) {
         const est = await navigator.storage.estimate();
-        const usedMB = ((est.usage || 0) / (1024 * 1024)).toFixed(1);
-        const quotaMB = ((est.quota || 0) / (1024 * 1024)).toFixed(0);
-        statusEl.textContent = `Local Storage: ${usedMB} MB used (Safe offline quota: ${quotaMB} MB)`;
-      } else {
-        statusEl.textContent = 'Storage: Offline Persistent';
+        const used = (est.usage / (1024 * 1024)).toFixed(1);
+        const quota = (est.quota / (1024 * 1024)).toFixed(0);
+        document.getElementById('storageUsage').textContent = used + ' MB';
+        document.getElementById('storageQuota').textContent = quota + ' MB';
       }
     }
 
-    const importInput = document.getElementById('importInput');
-    if (importInput) {
-      importInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        try {
-          const text = await file.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(text, 'text/html');
-
-          const subject = doc.querySelector('.card .subject')?.textContent || 'General Studies';
-          const title = doc.querySelector('.card h1')?.textContent || file.name.replace('.html', '');
-          const meta = doc.querySelector('.card .meta')?.textContent || 'Imported ' + new Date().toLocaleDateString('en-ZA');
-          const notes = doc.querySelector('.card p')?.textContent || '';
-
-          const imgElements = doc.querySelectorAll('.card img');
-          const photoBlobs = [];
-          for (const img of imgElements) {
-            const src = img.getAttribute('src');
-            if (src && src.startsWith('data:image')) {
-              photoBlobs.push(dataURLtoBlob(src));
-            }
-          }
-
-          const audioElement = doc.querySelector('.card audio');
-          let audioBlob = null;
-          if (audioElement && audioElement.getAttribute('src')) {
-            audioBlob = dataURLtoBlob(audioElement.getAttribute('src'));
-          }
-
-          const lessonRecord = {
-            subject: subject,
-            title: title,
-            notes: notes,
-            photos: photoBlobs,
-            audioBlob: audioBlob,
-            date: meta.replace('Captured: ', '').split(' • ')[0] || new Date().toLocaleDateString('en-ZA')
-          };
-
-          const tx = db.transaction('lessons', 'readwrite');
-          tx.objectStore('lessons').add(lessonRecord);
-          tx.oncomplete = () => {
-            alert('Success! Lecture imported into your library.');
-            importInput.value = '';
-            loadSavedLessons();
-            updateStorageStats();
-          };
-        } catch (err) {
-          alert('Could not parse this lecture file.');
-          console.error(err);
-        }
-      });
-    }
-
-    function dataURLtoBlob(dataurl) {
-      const arr = dataurl.split(',');
-      const mime = arr[0].match(/:(.*?);/)[1];
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], { type: mime });
-    }
-
-    const lessonSubject = document.getElementById('lessonSubject');
-    const customSubjectInput = document.getElementById('customSubjectInput');
-    lessonSubject.addEventListener('change', () => {
-      if (lessonSubject.value === 'Custom') {
-        customSubjectInput.classList.remove('hidden');
-      } else {
-        customSubjectInput.classList.add('hidden');
-      }
-    });
-
-    let capturedPhotos = [];
-    const cameraInput = document.getElementById('cameraInput');
-    const photoPreviewGrid = document.getElementById('photoPreviewGrid');
-    const photoCountSpan = document.getElementById('photoCount');
-    const imageStats = document.getElementById('imageStats');
-    const canvas = document.getElementById('compressorCanvas');
-    const ctx = canvas.getContext('2d');
-
-    cameraInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
+    /* PHOTO CAPTURE & COMPRESSION */
+    function handlePhotoCapture(event) {
+      const file = event.target.files[0];
       if (!file) return;
-
-      if (capturedPhotos.length >= 5) {
-        alert('Maximum of 5 photos per lecture reached.');
-        return;
-      }
-
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-        const MAX_DIM = 1280;
-
-        if (width > height && width > MAX_DIM) {
-          height = Math.round((height * MAX_DIM) / width);
-          width = MAX_DIM;
-        } else if (height > MAX_DIM) {
-          width = Math.round((width * MAX_DIM) / height);
-          height = MAX_DIM;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const imgData = ctx.getImageData(0, 0, width, height);
-        const d = imgData.data;
-        for (let i = 0; i < d.length; i += 4) {
-          const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-          const contrast = (gray - 128) * 1.3 + 128;
-          const clamped = Math.min(255, Math.max(0, contrast));
-          d[i] = clamped;
-          d[i + 1] = clamped;
-          d[i + 2] = clamped;
-        }
-        ctx.putImageData(imgData, 0, 0);
-
-        canvas.toBlob((blob) => {
-          const compressedKB = (blob.size / 1024).toFixed(0);
-          capturedPhotos.push({ blob: blob, sizeKB: compressedKB });
-          renderPhotoStrip();
-        }, 'image/webp', 0.65);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1200;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const imgData = ctx.getImageData(0, 0, w, h);
+          const d = imgData.data;
+          for (let i = 0; i < d.length; i += 4) {
+            const v = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+            d[i] = d[i+1] = d[i+2] = v > 125 ? 255 : (v < 90 ? 0 : v);
+          }
+          ctx.putImageData(imgData, 0, 0);
+          canvas.toBlob((blob) => {
+            queuedPhotos.push(blob);
+            document.getElementById('photoCountBadge').textContent = queuedPhotos.length;
+          }, 'image/webp', 0.65);
+        };
+        img.src = e.target.result;
       };
-    });
-
-    function renderPhotoStrip() {
-      photoPreviewGrid.innerHTML = '';
-      capturedPhotos.forEach((photo, idx) => {
-        const div = document.createElement('div');
-        div.className = 'photo-thumb-container';
-        div.innerHTML = `
-          <img src="${URL.createObjectURL(photo.blob)}" />
-          <span class="photo-badge">#${idx + 1} (${photo.sizeKB}KB)</span>
-        `;
-        photoPreviewGrid.appendChild(div);
-      });
-      photoCountSpan.textContent = capturedPhotos.length;
-      const totalKB = capturedPhotos.reduce((acc, p) => acc + parseInt(p.sizeKB), 0);
-      imageStats.textContent = `${capturedPhotos.length} capture(s) queued • Total: ${totalKB} KB`;
+      reader.readAsDataURL(file);
     }
 
-    let mediaRecorder;
-    let audioChunks = [];
-    let currentAudioBlob = null;
-    let recordInterval;
-    let secondsRecorded = 0;
-    const recordBtn = document.getElementById('recordBtn');
-    const audioTimer = document.getElementById('audioTimer');
-    const audioPreview = document.getElementById('audioPreview');
-    const audioStats = document.getElementById('audioStats');
-
-    recordBtn.addEventListener('click', async () => {
+    /* AUDIO CAPTURE */
+    async function toggleAudioRecording() {
+      const btn = document.getElementById('audioRecordBtn');
       if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️ Record Audio';
         return;
       }
-
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } 
-        });
-
-        let mimeType = 'audio/webm;codecs=opus';
-        if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = 'audio/webm';
-          if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
-        }
-
-        mediaRecorder = new MediaRecorder(stream, {
-          mimeType: mimeType,
-          audioBitsPerSecond: 16000
-        });
-
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) audioChunks.push(e.data);
-        };
-
-        mediaRecorder.onstart = () => {
-          secondsRecorded = 0;
-          recordBtn.classList.add('recording');
-          recordBtn.textContent = '⏹ Stop Recording';
-          recordInterval = setInterval(() => {
-            secondsRecorded++;
-            const mins = Math.floor(secondsRecorded / 60);
-            const secs = secondsRecorded % 60;
-            audioTimer.textContent = `Recording: ${mins}:${secs < 10 ? '0' : ''}${secs} (Max 10:00)`;
-            if (secondsRecorded >= 600) mediaRecorder.stop();
-          }, 1000);
-        };
-
+        mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          clearInterval(recordInterval);
-          recordBtn.classList.remove('recording');
-          recordBtn.textContent = '🎤 Record Lecturer (Max 10m)';
-          currentAudioBlob = new Blob(audioChunks, { type: mimeType });
-          audioPreview.src = URL.createObjectURL(currentAudioBlob);
-          audioPreview.classList.remove('hidden');
-          const audioKB = (currentAudioBlob.size / 1024).toFixed(0);
-          audioStats.textContent = `Audio Size: ${audioKB} KB (${secondsRecorded}s)`;
-          stream.getTracks().forEach(track => track.stop());
+          recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          document.getElementById('audioStatusBadge').textContent = `${(recordedAudioBlob.size / 1024).toFixed(0)} KB ready`;
+          stream.getTracks().forEach(t => t.stop());
         };
-
-        mediaRecorder.start(5000);
+        mediaRecorder.start();
+        btn.classList.add('recording');
+        btn.textContent = '⏹️ Stop Recording';
       } catch (err) {
-        alert('Microphone permission required for audio capture.');
+        alert('Microphone access required for audio capture.');
       }
-    });
+    }
 
-    const saveBtn = document.getElementById('saveLessonBtn');
-    const lessonTopic = document.getElementById('lessonTopic');
-    const lessonNotes = document.getElementById('lessonNotes');
-    const lessonsContainer = document.getElementById('lessonsContainer');
-    const filterSubject = document.getElementById('filterSubject');
-    const searchInput = document.getElementById('searchInput');
-
-    saveBtn.addEventListener('click', () => {
-      let subject = lessonSubject.value;
-      if (subject === 'Custom') {
-        subject = customSubjectInput.value.trim() || 'General Studies';
-      }
-      const topic = lessonTopic.value.trim() || 'Untitled Lecture';
-      const notes = lessonNotes.value.trim();
-
-      if (capturedPhotos.length === 0 && !currentAudioBlob && !notes) {
-        alert('Please snap a slide, record audio, or write a note.');
-        return;
-      }
-
-      const lessonRecord = {
-        subject: subject,
-        title: topic,
-        notes: notes,
-        photos: capturedPhotos.map(p => p.blob),
-        audioBlob: currentAudioBlob,
+    /* SAVE LESSON */
+    function saveActiveLesson() {
+      const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Lecture';
+      const faculty = document.getElementById('facultySelect').value;
+      const notes = document.getElementById('lessonNotes').value.trim();
+      const record = {
+        title, faculty, notes,
+        photos: queuedPhotos,
+        audio: recordedAudioBlob,
         date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
       };
-
       const tx = db.transaction('lessons', 'readwrite');
-      tx.objectStore('lessons').add(lessonRecord);
+      tx.objectStore('lessons').add(record);
       tx.oncomplete = () => {
-        lessonTopic.value = '';
-        lessonNotes.value = '';
-        customSubjectInput.value = '';
-        capturedPhotos = [];
-        currentAudioBlob = null;
-        renderPhotoStrip();
-        imageStats.textContent = '';
-        audioPreview.classList.add('hidden');
-        audioStats.textContent = '';
-        audioTimer.textContent = 'Status: Idle';
-        loadSavedLessons();
-        updateStorageStats();
-      };
-    });
-
-    filterSubject.addEventListener('change', () => loadSavedLessons());
-    searchInput.addEventListener('input', () => loadSavedLessons());
-
-    function loadSavedLessons() {
-      const tx = db.transaction('lessons', 'readonly');
-      const store = tx.objectStore('lessons');
-      const req = store.getAll();
-
-      req.onsuccess = () => {
-        const allItems = req.result || [];
-        
-        const subjects = Array.from(new Set(allItems.map(i => i.subject || 'General Studies')));
-        const currentSelection = filterSubject.value;
-        filterSubject.innerHTML = '<option value="ALL">All Faculties</option>' + 
-          subjects.map(s => `<option value="${escapeHTML(s)}" ${s === currentSelection ? 'selected' : ''}>${escapeHTML(s)}</option>`).join('');
-
-        let filtered = [...allItems];
-        const selectedFilter = filterSubject.value;
-        if (selectedFilter !== 'ALL') {
-          filtered = filtered.filter(i => (i.subject || 'General Studies') === selectedFilter);
-        }
-
-        const query = searchInput.value.trim().toLowerCase();
-        if (query) {
-          filtered = filtered.filter(i => 
-            (i.title && i.title.toLowerCase().includes(query)) ||
-            (i.subject && i.subject.toLowerCase().includes(query)) ||
-            (i.notes && i.notes.toLowerCase().includes(query))
-          );
-        }
-
-        if (filtered.length === 0) {
-          lessonsContainer.innerHTML = '<p class="sub">No lectures found in this view.</p>';
-          return;
-        }
-
-        lessonsContainer.innerHTML = filtered.reverse().map(item => {
-          const photoArray = item.photos || (item.imageBlob ? [item.imageBlob] : []);
-          return `
-            <div class="lesson-item" id="lesson-${item.id}">
-              <div class="lesson-header">
-                <span class="lesson-subject-pill">${escapeHTML(item.subject || 'General Studies')}</span>
-                <span class="lesson-meta">${item.date}</span>
-              </div>
-              <div class="lesson-title">${escapeHTML(item.title)}</div>
-              <div class="lesson-meta" style="margin-top:2px;">${photoArray.length} Slide(s) ${item.audioBlob ? '• Audio Included' : ''}</div>
-              
-              <button class="btn btn-study" onclick="openStudyModal(${Number(item.id)})">📖 Open Study Reader</button>
-
-              <div style="display:flex; gap:6px; margin-top:8px;">
-                <button class="btn btn-share" style="margin-top:0; flex:1;" onclick="shareLesson(${item.id})">📲 Share</button>
-                <button class="btn btn-download" style="margin-top:0; flex:1;" onclick="downloadLesson(${item.id})">⬇️ Save File</button>
-                <button class="btn btn-delete" style="margin-top:0; flex:0.7;" onclick="deleteLesson(${item.id}, '${escapeHTML(item.title)}')">🗑️ Delete</button>
-              </div>
-            </div>
-          `;
-        }).join('');
+        queuedPhotos = [];
+        recordedAudioBlob = null;
+        document.getElementById('lessonTitle').value = '';
+        document.getElementById('lessonNotes').value = '';
+        document.getElementById('photoCountBadge').textContent = '0';
+        document.getElementById('audioStatusBadge').textContent = 'None';
+        refreshTelemetry();
+        loadLessons();
       };
     }
 
-    /* STUDY READER MODAL LOGIC */
-    window.openStudyModal = function(id) {
-      const targetId = Number(id);
+    /* LOAD & DISPLAY */
+    function loadLessons() {
       const tx = db.transaction('lessons', 'readonly');
-      const store = tx.objectStore('lessons');
-      const req = store.get(targetId);
-
+      const req = tx.objectStore('lessons').getAll();
       req.onsuccess = () => {
-        const item = req.result;
-        if (!item) {
-          alert('Lecture not found.');
-          return;
-        }
-
-        document.getElementById('studyFacultyBadge').textContent = item.subject || 'General Studies';
-        document.getElementById('studyTitle').textContent = item.title || 'Untitled Lecture';
-        document.getElementById('studyMeta').textContent = `Captured: ${item.date}`;
-
-        const audioContainer = document.getElementById('studyAudioContainer');
-        if (item.audioBlob) {
-          audioContainer.innerHTML = `<audio controls src="${URL.createObjectURL(item.audioBlob)}"></audio>`;
-        } else {
-          audioContainer.innerHTML = '';
-        }
-
-        const notesBox = document.getElementById('studyNotesBox');
-        if (item.notes && item.notes.trim()) {
-          notesBox.innerHTML = `<strong>Lecture Notes & Key Formulas:</strong><p style="margin-top:6px; white-space:pre-wrap;">${escapeHTML(item.notes)}</p>`;
-          notesBox.classList.remove('hidden');
-        } else {
-          notesBox.classList.add('hidden');
-        }
-
-        const slidesContainer = document.getElementById('studySlidesContainer');
-        slidesContainer.innerHTML = '';
-        const photoArray = item.photos || (item.imageBlob ? [item.imageBlob] : []);
-        photoArray.forEach((blob, idx) => {
-          const wrapper = document.createElement('div');
-          wrapper.innerHTML = `
-            <div style="font-size:0.8rem; font-weight:600; color:#94a3b8; margin-bottom:4px;">Slide / Board ${idx + 1}</div>
-            <img src="${URL.createObjectURL(blob)}" alt="Slide ${idx + 1}" />
-          `;
-          slidesContainer.appendChild(wrapper);
-        });
-
-        document.getElementById('studyModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        allLessonsCache = req.result || [];
+        renderLessons(allLessonsCache);
       };
-    };
-
-    window.closeStudyModal = function() {
-      document.getElementById('studyModal').classList.add('hidden');
-      document.body.style.overflow = 'auto';
-      document.getElementById('studyAudioContainer').innerHTML = '';
-    };
-
-    window.deleteLesson = function(id, title) {
-      if (confirm(`Delete "${title}" from your offline library? This cannot be undone.`)) {
-        const tx = db.transaction('lessons', 'readwrite');
-        tx.objectStore('lessons').delete(id);
-        tx.oncomplete = () => {
-          loadSavedLessons();
-          updateStorageStats();
-        };
-      }
-    };
-
-    async function buildLessonHTML(item) {
-      const photoArray = item.photos || (item.imageBlob ? [item.imageBlob] : []);
-      const base64Images = [];
-      for (const blob of photoArray) {
-        base64Images.push(await blobToDataURL(blob));
-      }
-
-      let audioSrc = '';
-      if (item.audioBlob) {
-        audioSrc = await blobToDataURL(item.audioBlob);
-      }
-
-      return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHTML(item.title)}</title>
-  <style>
-    body { background: #0f172a; color: #f8fafc; font-family: sans-serif; padding: 16px; margin: 0; }
-    .card { background: #1e293b; padding: 16px; border-radius: 8px; max-width: 550px; margin: auto; }
-    .subject { display: inline-block; font-size: 0.75rem; background: #334155; color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-bottom: 6px; }
-    h1 { font-size: 1.25rem; color: #10b981; margin: 0 0 4px 0; }
-    .meta { font-size: 0.75rem; color: #94a3b8; margin-bottom: 12px; }
-    .page-title { font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-top: 12px; }
-    img { width: 100%; border-radius: 6px; margin-top: 4px; }
-    audio { width: 100%; margin-top: 14px; }
-    p { font-size: 0.9rem; line-height: 1.4; margin-top: 8px; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <span class="subject">${escapeHTML(item.subject || 'General Studies')}</span>
-    <h1>${escapeHTML(item.title)}</h1>
-    <div class="meta">Captured: ${item.date} • FundiPocket Standalone Lecture</div>
-    ${item.notes ? `<p>${escapeHTML(item.notes)}</p>` : ''}
-    ${base64Images.map((src, i) => `
-      <div class="page-title">Slide / Whiteboard ${i + 1}</div>
-      <img src="${src}" alt="Board ${i + 1}" />
-    `).join('')}
-    ${audioSrc ? `<div class="page-title">Lecturer Audio Recording</div><audio controls src="${audioSrc}"></audio>` : ''}
-  </div>
-</body>
-</html>`;
     }
 
-    window.shareLesson = async function(id) {
-      const tx = db.transaction('lessons', 'readonly');
-      const store = tx.objectStore('lessons');
-      const req = store.get(id);
-
-      req.onsuccess = async () => {
-        const item = req.result;
-        if (!item) return;
-
-        const standaloneHTML = await buildLessonHTML(item);
-        const filename = `${(item.title || 'lesson').replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`;
-        const file = new File([standaloneHTML], filename, { type: 'text/html' });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: item.title,
-              text: `${item.subject}: ${item.title}`
-            });
-          } catch (err) {
-            if (err.name !== 'AbortError') console.error(err);
-          }
-        } else {
-          downloadLesson(id);
-        }
-      };
-    };
-
-    window.downloadLesson = async function(id) {
-      const tx = db.transaction('lessons', 'readonly');
-      const store = tx.objectStore('lessons');
-      const req = store.get(id);
-
-      req.onsuccess = async () => {
-        const item = req.result;
-        if (!item) return;
-
-        const standaloneHTML = await buildLessonHTML(item);
-        const filename = `${(item.title || 'lesson').replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`;
-        
-        const blob = new Blob([standaloneHTML], { type: 'text/html' });
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const dataUrl = e.target.result;
-          const downloadLink = document.createElement('a');
-          downloadLink.href = dataUrl;
-          downloadLink.download = filename;
-          downloadLink.target = '_blank';
-          downloadLink.rel = 'noopener';
-          document.body.appendChild(downloadLink);
-          downloadLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-          document.body.removeChild(downloadLink);
-          alert(`Download started for ${filename}! Check your phone notification or Downloads.`);
-        };
-        reader.readAsDataURL(blob);
-      };
-    };
-
-    function blobToDataURL(blob) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
+    function renderLessons(list) {
+      const container = document.getElementById('lessonsList');
+      container.innerHTML = '';
+      if (list.length === 0) {
+        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No lessons found in this view.</div>';
+        return;
+      }
+      list.forEach(l => {
+        const div = document.createElement('div');
+        div.className = 'lesson-card';
+        div.innerHTML = `
+          <div class="lesson-meta">
+            <span class="faculty-tag">${l.faculty}</span>
+            <span style="color:var(--text-muted); font-size:0.75rem;">${l.date}</span>
+          </div>
+          <div class="lesson-title">${l.title}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">${(l.notes || '').substring(0, 75)}...</div>
+          <div class="lesson-actions">
+            <button class="btn-action btn-read" onclick="openStudyModal(${l.id})">📖 Study</button>
+            <button class="btn-action btn-share" onclick="shareLessonBundle(${l.id})">📲 Share</button>
+            <button class="btn-action btn-download" onclick="downloadLessonBundle(${l.id})">⬇️ Save</button>
+            <button class="btn-action btn-delete" onclick="deleteLesson(${l.id})">🗑️</button>
+          </div>
+        `;
+        container.appendChild(div);
       });
     }
 
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    function filterLessons() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allLessonsCache.filter(l => 
+        l.title.toLowerCase().includes(q) ||
+        l.faculty.toLowerCase().includes(q) ||
+        (l.notes && l.notes.toLowerCase().includes(q))
+      );
+      renderLessons(filtered);
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      await initDB();
-      await updateStorageStats();
-      loadSavedLessons();
-    });
+    /* MODAL */
+    function openStudyModal(id) {
+      const lesson = allLessonsCache.find(l => l.id === Number(id));
+      if (!lesson) return;
+      document.getElementById('modalFaculty').textContent = lesson.faculty;
+      document.getElementById('modalTitle').textContent = lesson.title;
+      document.getElementById('modalDate').textContent = 'Captured: ' + lesson.date;
+      document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes recorded.';
+
+      const audioSec = document.getElementById('modalAudioSection');
+      audioSec.innerHTML = '';
+      if (lesson.audio) {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.style.width = '100%';
+        audio.src = URL.createObjectURL(lesson.audio);
+        audioSec.appendChild(audio);
+      }
+
+      const imgSec = document.getElementById('modalImagesContainer');
+      imgSec.innerHTML = '';
+      if (lesson.photos && lesson.photos.length > 0) {
+        lesson.photos.forEach(p => {
+          const img = document.createElement('img');
+          img.style.width = '100%';
+          img.style.borderRadius = '6px';
+          img.style.border = '1px solid var(--border)';
+          img.src = URL.createObjectURL(p);
+          imgSec.appendChild(img);
+        });
+      } else {
+        imgSec.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">No chalkboard photos attached.</span>';
+      }
+      document.getElementById('studyModal').classList.add('open');
+    }
+    function closeStudyModal() {
+      document.getElementById('studyModal').classList.remove('open');
+    }
+
+    /* DELETE */
+    function deleteLesson(id) {
+      if (!confirm('Permanently delete this lesson unit from your device storage?')) return;
+      const tx = db.transaction('lessons', 'readwrite');
+      tx.objectStore('lessons').delete(Number(id));
+      tx.oncomplete = () => {
+        refreshTelemetry();
+        loadLessons();
+      };
+    }
+
+    /* EXPORT & SHARE */
+    async function buildStandaloneHTML(lesson) {
+      const photoPromises = (lesson.photos || []).map(p => new Promise(res => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.readAsDataURL(p);
+      }));
+      const b64Photos = await Promise.all(photoPromises);
+
+      let b64Audio = '';
+      if (lesson.audio) {
+        b64Audio = await new Promise(res => {
+          const r = new FileReader();
+          r.onload = () => res(r.result);
+          r.readAsDataURL(lesson.audio);
+        });
+      }
+
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${lesson.title}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${lesson.faculty}</span><h1>${lesson.title}</h1><p style="font-size:0.8rem;color:#94a3b8">${lesson.date}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${lesson.notes}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Tertiary Study Toolkit • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
+    }
+
+    async function downloadLessonBundle(id) {
+      const lesson = allLessonsCache.find(l => l.id === Number(id));
+      if (!lesson) return;
+      const html = await buildStandaloneHTML(lesson);
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`;
+      a.click();
+    }
+
+    async function shareLessonBundle(id) {
+      const lesson = allLessonsCache.find(l => l.id === Number(id));
+      if (!lesson) return;
+      const html = await buildStandaloneHTML(lesson);
+      const file = new File([html], `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`, { type: 'text/html' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: lesson.title, text: 'Here is our offline lecture bundle from FundiPocket.' });
+      } else {
+        downloadLessonBundle(id);
+      }
+    }
+
+    /* IMPORT LESSON */
+    function importSharedLesson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
+        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Lesson').trim();
+        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim();
+        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim();
+        
+        const tx = db.transaction('lessons', 'readwrite');
+        tx.objectStore('lessons').add({
+          title: title + ' (Imported)',
+          faculty,
+          notes,
+          photos: [],
+          audio: null,
+          date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+        });
+        tx.oncomplete = () => {
+          alert(`Successfully imported: ${title}`);
+          refreshTelemetry();
+          loadLessons();
+        };
+      };
+      reader.readAsText(file);
+    }
   </script>
 </body>
 </html>
