@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FundiPocket — Offline Student Toolkit</title>
+  <title>FundiPocket — Offline Learning Companion</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -166,7 +166,7 @@
     <header>
       <div class="brand">
         <h1>FundiPocket</h1>
-        <p>Offline Tertiary Knowledge Hub • Zero-Data PWA</p>
+        <p>Offline-First Learning Companion • Built for Low-Data Environments</p>
       </div>
       <button class="theme-btn" id="themeToggleBtn" onclick="toggleAppTheme()">
         🌙 Dark
@@ -180,34 +180,34 @@
     </div>
 
     <label class="import-btn-label">
-      📥 Import Shared Lesson (.html)
+      📥 Receive Shared Learning (.html)
       <input type="file" accept=".html,text/html" id="importFileInput" style="display:none;" onchange="importSharedLesson(event)">
     </label>
 
     <!-- CAPTURE FORM -->
     <section class="card">
-      <h2>✍️ Capture Lecture Unit</h2>
+      <h2>✍️ Capture Learning</h2>
       
       <select id="facultySelect">
-        <option value="General Studies">General Studies / All Faculties</option>
-        <option value="Engineering & Built Environment">Engineering & Built Environment</option>
-        <option value="Law & Legal Studies">Law & Legal Studies</option>
-        <option value="Commerce & Management">Commerce & Management</option>
-        <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
-        <option value="Health Sciences">Health Sciences</option>
-        <option value="Science & Technology">Science & Technology</option>
+        <option value="General Studies">General / Any Learning</option>
+        <option value="Engineering / Technology / Built Environment">Engineering / Technology / Built Environment</option>
+        <option value="Law / Legal Studies">Law / Legal Studies</option>
+        <option value="Business / Commerce / Management">Business / Commerce / Management</option>
+        <option value="Humanities / Social Sciences">Humanities / Social Sciences</option>
+        <option value="Health / Life Sciences">Health / Life Sciences</option>
+        <option value="Science / Technology">Science / Technology</option>
       </select>
 
-      <input type="text" id="lessonTitle" placeholder="Lecture Topic / Code (e.g. Contract Law 101)">
-      <textarea id="lessonNotes" placeholder="Key formulas, whiteboard summary, or lecturer notes..."></textarea>
+      <input type="text" id="lessonTitle" placeholder="Subject / Topic / Module (e.g. Fractions, Electrical N2, Contract Law)">
+      <textarea id="lessonNotes" placeholder="Key ideas, formulas, page notes, teacher/tutor notes, or your own summary..."></textarea>
 
       <div class="btn-grid">
         <label class="btn btn-photo">
-          📷 Snap Slide/Board
+          📷 Capture Board / Page
           <input type="file" accept="image/*" capture="environment" id="photoCaptureInput" style="display:none;" onchange="handlePhotoCapture(event)">
         </label>
         <button class="btn btn-audio" id="audioRecordBtn" onclick="toggleAudioRecording()">
-          🎙️ Record Audio
+          🎙️ Record Learning Audio
         </button>
       </div>
 
@@ -215,13 +215,13 @@
         Photos queued: <span id="photoCountBadge">0</span> | Audio: <span id="audioStatusBadge">None</span>
       </div>
 
-      <button class="btn btn-save" onclick="saveActiveLesson()">💾 Save Lesson to Local Library</button>
+      <button class="btn btn-save" onclick="saveActiveLesson()">💾 Save Learning Offline</button>
     </section>
 
     <!-- SAVED LESSONS & SEARCH -->
     <section class="card">
-      <h2>📚 Saved Lessons Library</h2>
-      <input type="text" id="searchInput" placeholder="🔍 Search topic, formula, or faculty..." oninput="filterLessons()">
+      <h2>📚 My Learning</h2>
+      <input type="text" id="searchInput" placeholder="🔍 Search subject, topic, formula, or notes..." oninput="filterLessons()">
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
         <!-- Dynamic Cards -->
       </div>
@@ -341,7 +341,7 @@
       if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
         btn.classList.remove('recording');
-        btn.textContent = '🎙️ Record Audio';
+        btn.textContent = '🎙️ Record Learning Audio';
         return;
       }
       try {
@@ -401,7 +401,7 @@
       const container = document.getElementById('lessonsList');
       container.innerHTML = '';
       if (list.length === 0) {
-        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No lessons found in this view.</div>';
+        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No saved learning found in this view.</div>';
         return;
       }
       list.forEach(l => {
@@ -442,7 +442,7 @@
       document.getElementById('modalFaculty').textContent = lesson.faculty;
       document.getElementById('modalTitle').textContent = lesson.title;
       document.getElementById('modalDate').textContent = 'Captured: ' + lesson.date;
-      document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes recorded.';
+      document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes saved.';
 
       const audioSec = document.getElementById('modalAudioSection');
       audioSec.innerHTML = '';
@@ -466,7 +466,7 @@
           imgSec.appendChild(img);
         });
       } else {
-        imgSec.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">No chalkboard photos attached.</span>';
+        imgSec.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">No board, page, or note photos attached.</span>';
       }
       document.getElementById('studyModal').classList.add('open');
     }
@@ -476,7 +476,7 @@
 
     /* DELETE */
     function deleteLesson(id) {
-      if (!confirm('Permanently delete this lesson unit from your device storage?')) return;
+      if (!confirm('Permanently delete this saved learning from your device?')) return;
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').delete(Number(id));
       tx.oncomplete = () => {
@@ -503,7 +503,7 @@
         });
       }
 
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${lesson.title}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${lesson.faculty}</span><h1>${lesson.title}</h1><p style="font-size:0.8rem;color:#94a3b8">${lesson.date}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${lesson.notes}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Tertiary Study Toolkit • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${lesson.title}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${lesson.faculty}</span><h1>${lesson.title}</h1><p style="font-size:0.8rem;color:#94a3b8">${lesson.date}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${lesson.notes}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
     }
 
     async function downloadLessonBundle(id) {
@@ -523,7 +523,7 @@
       const html = await buildStandaloneHTML(lesson);
       const file = new File([html], `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`, { type: 'text/html' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: lesson.title, text: 'Here is our offline lecture bundle from FundiPocket.' });
+        navigator.share({ files: [file], title: lesson.title, text: 'Here is offline learning shared from FundiPocket.' });
       } else {
         downloadLessonBundle(id);
       }
@@ -556,6 +556,14 @@
         };
       };
       reader.readAsText(file);
+    }
+    /* OFFLINE PWA REGISTRATION */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.warn('FundiPocket offline service unavailable:', err);
+        });
+      });
     }
   </script>
 </body>
