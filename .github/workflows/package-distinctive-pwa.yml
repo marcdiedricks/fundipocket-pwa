@@ -1,0 +1,19 @@
+name: Package FundiPocket Distinctive PWA
+on:
+  push:
+    branches: [work/distinctive-pwa-v1-20261124]
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare deployable site
+        run: |
+          mkdir site
+          cp index.html landing.html manifest.json qr.html sw.js site/
+      - name: Upload deployable package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FundiPocket_DISTINCTIVE_PWA_PHONE_TEST
+          path: site/*
+          if-no-files-found: error
