@@ -206,6 +206,22 @@
       </button>
     </header>
 
+    <!-- LEARNER LANGUAGE + CONNECTIVITY MODE -->
+    <section aria-label="Language and learning mode" style="background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:12px;box-shadow:0 8px 22px rgba(23,50,77,.08);">
+      <div style="font-size:.76rem;font-weight:900;color:var(--text-muted);margin-bottom:8px;">LANGUAGE</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;">
+        <button class="btn lang-btn" data-lang="en" onclick="setLanguage('en')" style="padding:9px 11px;flex:1 1 28%;min-width:90px;">English</button>
+        <button class="btn lang-btn" data-lang="af" onclick="setLanguage('af')" style="padding:9px 11px;flex:1 1 28%;min-width:90px;">Afrikaans</button>
+        <button class="btn lang-btn" data-lang="xh" onclick="setLanguage('xh')" style="padding:9px 11px;flex:1 1 28%;min-width:90px;">isiXhosa</button>
+        <button class="btn lang-btn" data-lang="zu" onclick="setLanguage('zu')" style="padding:9px 11px;flex:1 1 42%;min-width:110px;">isiZulu</button>
+        <button class="btn lang-btn" data-lang="nso" onclick="setLanguage('nso')" style="padding:9px 11px;flex:1 1 42%;min-width:110px;">Sepedi</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn" id="modeToggleBtn" onclick="toggleLearningMode()" style="padding:10px 14px;background:var(--accent);color:white;white-space:nowrap;">📴 Offline</button>
+        <div id="modeHelp" style="font-size:.73rem;color:var(--text-muted);line-height:1.35;">Offline Learning: summaries, checks and saved learning stay on this device.</div>
+      </div>
+    </section>
+
     <!-- SIMPLE BENTO HOME: core actions stay available without a heavy framework -->
     <nav class="bento-grid" aria-label="FundiPocket learning actions">
       <button class="bento-tile" onclick="goToSection('captureSection')"><span class="bento-icon">📥</span><strong>CAPTURE</strong><small>Bring a lesson, lecture, page or notes into your pocket</small></button>
@@ -536,6 +552,8 @@
       learningMode=learningMode==='offline'?'online':'offline';
       localStorage.setItem('fundipocket_mode',learningMode); updateLearningModeUI();
     }
+    // Apply the learner's saved language and mode to the visible controls.
+    setLanguage(currentLanguage);
     /* OFFLINE LEARNING PACK — captured text only; no network call */
     let currentQuiz = [];
     let learningPackBusy = false;
