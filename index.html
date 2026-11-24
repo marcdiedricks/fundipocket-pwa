@@ -329,16 +329,16 @@
       const pill = document.getElementById('offlineReadyPill');
       if (!pill) return;
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(() => { pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineReady; }).catch(() => { pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineCheck; });
+        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE SHELL: READY'; }).catch(() => { pill.textContent = 'OFFLINE SHELL: CHECK'; });
       } else {
-        pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineLimited;
+        pill.textContent = 'OFFLINE SHELL: LIMITED';
       }
       updateNetworkPill();
     });
     function updateNetworkPill() {
       const p = document.getElementById('networkPill');
       if (!p) return;
-      const s=systemTranslations[currentLanguage]||systemTranslations.en; p.textContent = navigator.onLine ? s.networkAvailable : s.networkOffline;
+      p.textContent = navigator.onLine ? 'NETWORK: AVAILABLE' : 'NETWORK: OFFLINE';
       p.classList.toggle('ok', !navigator.onLine);
     }
     window.addEventListener('online', updateNetworkPill);
@@ -360,7 +360,7 @@
     function updateThemeButtonLabel(theme) {
       const btn = document.getElementById('themeToggleBtn');
       if (!btn) return;
-      const s=systemTranslations[currentLanguage]||systemTranslations.en; btn.textContent = theme === 'dark' ? '☀️ '+s.light : '🌙 '+s.dark;
+      btn.innerHTML = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
     }
     initTheme();
 
@@ -383,12 +383,12 @@
     dbReq.onsuccess = (e) => {
       db = e.target.result;
       const storagePill = document.getElementById('localStoragePill');
-      if (storagePill) storagePill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).storageReady;
+      if (storagePill) storagePill.textContent = 'LOCAL STORAGE: READY';
       refreshTelemetry();
       loadLessons();
     };
     dbReq.onerror = () => {
-      alert(rm('storageOpen'));
+      alert('FundiPocket could not open local storage. Your device may be low on storage or private browsing may be blocking offline saving.');
     };
 
     /* ASK SUPPORTED BROWSERS TO REDUCE AUTOMATIC EVICTION OF OFFLINE LEARNING */
@@ -415,12 +415,12 @@
       const file = event.target.files[0];
       if (!file) return;
       if (queuedPhotos.length >= 5) {
-        alert(rm('photoLimit'));
+        alert('You can attach up to 5 photos to one learning item. Save this item, then start another if you need more.');
         event.target.value = '';
         return;
       }
       if (file.size > 8 * 1024 * 1024) {
-        alert(rm('shareLarge'));
+        alert('This shared file is larger than 8 MB. For low-storage phones, ask the sender for a smaller learning bundle.');
         event.target.value = '';
         return;
       }
@@ -447,7 +447,7 @@
           ctx.putImageData(imgData, 0, 0);
           canvas.toBlob((blob) => {
             if (!blob) {
-              alert(rm('photoFail'));
+              alert('This photo could not be prepared. Please try another photo.');
               return;
             }
             queuedPhotos.push(blob);
@@ -465,12 +465,12 @@
       try {
         if (!navigator.clipboard || !navigator.clipboard.readText) throw new Error('clipboard unavailable');
         const text = await navigator.clipboard.readText();
-        if (!text) { alert(rm('clipboardEmpty')); return; }
+        if (!text) { alert('Your clipboard is empty. Copy some text first, then return to FundiPocket.'); return; }
         box.value = box.value ? box.value + '\n\n' + text : text;
         box.focus();
       } catch (e) {
         box.focus();
-        alert(rm('pasteHelp'));
+        alert('Press and hold inside the notes box, then choose Paste. Your browser controls clipboard permission.');
       }
     }
     function focusLearningText() {
@@ -490,7 +490,7 @@
       }
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
-          alert(rm('audioUnsupported'));
+          alert('Audio recording is not supported on this device/browser. You can still save notes and photos offline.');
           return;
         }
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -518,62 +518,42 @@
         btn.classList.add('recording');
         btn.textContent = '⏹️ Stop Recording';
       } catch (err) {
-        alert(rm('micRequired'));
+        alert('Microphone access required for audio capture.');
       }
     }
 
     const uiTranslations={
-en:{tag:'Offline-First Learning Companion • Built for Low-Data Environments',capture:'📥 Capture your learning',pack:'✨ My Learning Pack',library:'📚 My Learning',offline:'📴 Offline',online:'🌐 Online',offlineHelp:'Offline learning: summaries, knowledge checks and saved learning stay on this device.',onlineHelp:'Online assist: connectivity is available, while your saved learning still stays on this device.',tiles:['CAPTURE','SUMMARY','CHECK MY KNOWLEDGE','MY POCKET'],tileHelp:['Bring a lesson, lecture, page or notes into your pocket','Turn captured text into a clear revision summary','A short, friendly check from what you captured','Open saved learning, even offline'],captureIntro:'Capture useful learning while you have access to it, then keep it on this phone for later. Use FundiPocket for school, further study, training, work or everyday learning.',titlePh:'Give this learning a short title',notesPh:'Type, paste or add the learning you want to keep. This can be from school, college, university, training, work or everyday life.',paste:'📋 Paste from Clipboard',type:'⌨️ Type My Notes',pasteHelp:'You can also press and hold inside the notes box and choose Paste.',photo:'📷 Capture Board / Page',audio:'🎙️ Record Learning Audio',photos:'Photos queued:',audioLabel:'Audio:',none:'None',make:'✨ Make My Learning Pack',packEmpty:'Capture lesson text above, then tap Make My Learning Pack. Your summary and knowledge check will appear here.',yourSummary:'🌟 Your Summary',check:'🎯 Check My Knowledge',checkHelp:'A quick check — not an exam. Use the summary if you need help.',answers:'🎉 Check My Answers',search:'🔍 Search your saved learning...',backup:'🧰 Backup Library',restore:'♻️ Restore Saved Backup',restoreHelp:'Restore opens your device Files. Choose FundiPocket_Library_Backup.json from Downloads or wherever you saved it.',empty:'No saved learning found in this view.',saved:'Saved Offline',study:'📖 Study',share:'📲 Share',save:'⬇️ Save',close:'✕ Close',photosHeading:'Board / Page / Note Photos',summaryHeading:'✨ Summary',captured:'Captured Learning',qKey:'🧠 KEY IDEA — In your own words, what is one important idea from this learning?',qExplain:'🔎 EXPLAIN — Why or how does this happen? Explain one cause, reason or process from the learning.',qDetail:'💡 REMEMBER — Give one important fact or detail you would want to remember later.',qApply:'🌍 APPLY — How could this idea matter in real life, or what useful action can you take from it?'},
-af:{tag:'Vanlyn-eerste leermaat • Gebou vir lae-data-omgewings',capture:'📥 Vang jou leerwerk vas',pack:'✨ My Leerpak',library:'📚 My Leerwerk',offline:'📴 Vanlyn',online:'🌐 Aanlyn',offlineHelp:'Vanlyn leer: opsommings, kennistoetse en gestoorde leerwerk bly op hierdie toestel.',onlineHelp:'Aanlyn hulp: verbinding is beskikbaar, terwyl jou gestoorde leerwerk steeds op hierdie toestel bly.',tiles:['VANG VAS','OPSOMMING','TOETS MY KENNIS','MY SAK'],tileHelp:['Bring ’n les, lesing, bladsy of notas in jou sak','Verander vasgelegde teks in ’n duidelike hersieningsopsomming','’n Kort, vriendelike toets uit wat jy vasgelê het','Maak gestoorde leerwerk oop, selfs vanlyn'],captureIntro:'Vang nuttige leerwerk vas terwyl jy toegang daartoe het en hou dit op hierdie foon vir later. Gebruik FundiPocket vir skool, verdere studie, opleiding, werk of alledaagse leer.',titlePh:'Gee hierdie leerwerk ’n kort titel',notesPh:'Tik, plak of voeg die leerwerk by wat jy wil hou. Dit kan van skool, kollege, universiteit, opleiding, werk of die alledaagse lewe kom.',paste:'📋 Plak vanaf knipbord',type:'⌨️ Tik my notas',pasteHelp:'Jy kan ook binne die notasblokkie druk en hou en Plak kies.',photo:'📷 Neem bord / bladsy af',audio:'🎙️ Neem leerklank op',photos:'Foto’s gereed:',audioLabel:'Klank:',none:'Geen',make:'✨ Maak my leerpak',packEmpty:'Vang die lesteks hier bo vas en tik dan Maak my leerpak. Jou opsomming en kennistoets sal hier verskyn.',yourSummary:'🌟 Jou opsomming',check:'🎯 Toets my kennis',checkHelp:'’n Vinnige toets — nie ’n eksamen nie. Gebruik die opsomming as jy hulp nodig het.',answers:'🎉 Toets my antwoorde',search:'🔍 Soek jou gestoorde leerwerk...',backup:'🧰 Rugsteun biblioteek',restore:'♻️ Herstel gestoorde rugsteun',restoreHelp:'Herstel maak jou toestel se Lêers oop. Kies FundiPocket_Library_Backup.json uit Aflaaie of waar jy dit gestoor het.',empty:'Geen gestoorde leerwerk in hierdie aansig gevind nie.',saved:'Vanlyn gestoor',study:'📖 Leer',share:'📲 Deel',save:'⬇️ Stoor',close:'✕ Sluit',photosHeading:'Bord- / bladsy- / notafoto’s',summaryHeading:'✨ Opsomming',captured:'Vasgelegde leerwerk',qKey:'🧠 KERNIDEE — Wat is, in jou eie woorde, een belangrike idee uit hierdie leerwerk?',qExplain:'🔎 VERDUIDELIK — Waarom of hoe gebeur dit? Verduidelik een oorsaak, rede of proses uit die leerwerk.',qDetail:'💡 ONTHOU — Gee een belangrike feit of besonderheid wat jy later wil onthou.',qApply:'🌍 PAS TOE — Hoe kan hierdie idee in die werklike lewe saak maak, of watter nuttige aksie kan jy daaruit neem?'},
-xh:{tag:'Umncedisi wokufunda osebenza ngaphandle kwe-intanethi • Wenzelwe iindawo ezinedatha encinci',capture:'📥 Gcina okufundayo',pack:'✨ Ipakethi Yam Yokufunda',library:'📚 Izifundo Zam',offline:'📴 Ngaphandle kwe-intanethi',online:'🌐 Kwi-intanethi',offlineHelp:'Ukufunda ngaphandle kwe-intanethi: izishwankathelo, iimvavanyo zolwazi nezifundo ezigciniweyo zihlala kwesi sixhobo.',onlineHelp:'Uncedo lwe-intanethi: unxibelelwano luyafumaneka, kodwa izifundo zakho ezigciniweyo zihlala kwesi sixhobo.',tiles:['GCINA','ISISHWANKATHELO','HLOLA ULWAZI LWAM','IZIFUNDO ZAM'],tileHelp:['Faka isifundo, intetho, iphepha okanye amanqaku epokothweni yakho','Guqula umbhalo owugciniweyo ube sisishwankathelo esicacileyo sokuhlaziya','Uvavanyo olufutshane nolunobubele koko ukugcinileyo','Vula izifundo ezigciniweyo, nokuba akukho intanethi'],captureIntro:'Gcina ukufunda okuluncedo ngexesha usenako ukufikelela kuko, uze ukugcine kule fowuni ukuze ukufunde kamva. Sebenzisa iFundiPocket esikolweni, kwizifundo eziqhubekayo, kuqeqesho, emsebenzini okanye ekufundeni kwemihla ngemihla.',titlePh:'Nika esi sifundo isihloko esifutshane',notesPh:'Chwetheza, uncamathisele okanye wongeze okufundayo ofuna ukukugcina.',paste:'📋 Ncamathisela kwibhodi yokukopa',type:'⌨️ Chwetheza amanqaku am',pasteHelp:'Ungacofa uze ubambe ngaphakathi kwebhokisi yamanqaku, uze ukhethe Ncamathisela.',photo:'📷 Fota ibhodi / iphepha',audio:'🎙️ Rekhoda isifundo',photos:'Iifoto ezilindileyo:',audioLabel:'Isandi:',none:'Akukho',make:'✨ Yenza ipakethi yam yokufunda',packEmpty:'Gcina umbhalo wesifundo ngasentla, uze ucofe Yenza ipakethi yam yokufunda. Isishwankathelo novavanyo lolwazi ziya kuvela apha.',yourSummary:'🌟 Isishwankathelo sakho',check:'🎯 Hlola ulwazi lwam',checkHelp:'Uvavanyo olukhawulezayo — hayi uviwo. Sebenzisa isishwankathelo xa ufuna uncedo.',answers:'🎉 Hlola iimpendulo zam',search:'🔍 Khangela izifundo zakho ezigciniweyo...',backup:'🧰 Gcina ikopi yethala',restore:'♻️ Buyisela ikopi egciniweyo',restoreHelp:'Ukubuyisela kuvula iiFayile zesixhobo sakho. Khetha FundiPocket_Library_Backup.json kwiiDownloads okanye apho wayigcina khona.',empty:'Akukho sifundo sigciniweyo sifunyenweyo apha.',saved:'Igcinwe ngaphandle kwe-intanethi',study:'📖 Funda',share:'📲 Yabelana',save:'⬇️ Gcina',close:'✕ Vala',photosHeading:'Iifoto zebhodi / iphepha / amanqaku',summaryHeading:'✨ Isishwankathelo',captured:'Ukufunda okugcinwe',qKey:'🧠 INGONGOMA ENGUNDOQO — Ngamazwi akho, yeyiphi ingcinga ebalulekileyo oyifundileyo?',qExplain:'🔎 CACISA — Kutheni okanye kwenzeka njani oku? Cacisa unobangela, isizathu okanye inkqubo enye.',qDetail:'💡 KHUMBULA — Nika inyani okanye iinkcukacha ezibalulekileyo ofuna ukuzikhumbula kamva.',qApply:'🌍 SEBENZISA — Le ngcinga ingabaluleka njani ebomini bokwenene, okanye leliphi inyathelo eliluncedo onokulithatha?'},
-zu:{tag:'Umsizi wokufunda osebenza ngaphandle kwe-inthanethi • Wakhelwe izindawo ezinedatha encane',capture:'📥 Gcina okufundayo',pack:'✨ Iphakethe Lami Lokufunda',library:'📚 Ukufunda Kwami',offline:'📴 Ngaphandle kwe-inthanethi',online:'🌐 Ku-inthanethi',offlineHelp:'Ukufunda ngaphandle kwe-inthanethi: izifinyezo, ukuhlolwa kolwazi nokufunda okulondoloziwe kuhlala kule divayisi.',onlineHelp:'Usizo lwe-inthanethi: ukuxhumeka kuyatholakala, kodwa ukufunda okulondoloziwe kusahlala kule divayisi.',tiles:['GCINA','ISIFINYEZO','HLOLA ULWAZI LWAMI','IPHOKHETHI LAMI'],tileHelp:['Faka isifundo, inkulumo, ikhasi noma amanothi ephaketheni lakho','Guqula umbhalo owugciniwe ube isifinyezo esicacile sokubuyekeza','Ukuhlola okufushane nokunobungane kwalokho okugcine','Vula ukufunda okulondoloziwe, ngisho ungaxhunyiwe'],captureIntro:'Gcina ukufunda okuwusizo ngesikhathi usakwazi ukukufinyelela, bese ukugcina kule foni ukuze ukufunde kamuva. Sebenzisa iFundiPocket esikoleni, ezifundweni eziqhubekayo, ekuqeqesheni, emsebenzini noma ekufundeni kwansuku zonke.',titlePh:'Nikeza lokhu kufunda isihloko esifushane',notesPh:'Thayipha, namathisela noma engeza ukufunda ofuna ukukugcina.',paste:'📋 Namathisela ebhodini lokukopisha',type:'⌨️ Thayipha amanothi ami',pasteHelp:'Ungacindezela ubambe ngaphakathi kwebhokisi lamanothi bese ukhetha Namathisela.',photo:'📷 Thwebula ibhodi / ikhasi',audio:'🎙️ Rekhoda umsindo wokufunda',photos:'Izithombe ezilindile:',audioLabel:'Umsindo:',none:'Akukho',make:'✨ Yenza iphakethe lami lokufunda',packEmpty:'Gcina umbhalo wesifundo ngenhla bese uthepha Yenza iphakethe lami lokufunda. Isifinyezo nokuhlolwa kolwazi kuzovela lapha.',yourSummary:'🌟 Isifinyezo sakho',check:'🎯 Hlola ulwazi lwami',checkHelp:'Ukuhlola okusheshayo — akusona isivivinyo. Sebenzisa isifinyezo uma udinga usizo.',answers:'🎉 Hlola izimpendulo zami',search:'🔍 Sesha ukufunda kwakho okulondoloziwe...',backup:'🧰 Yenza ikhophi yomtapo',restore:'♻️ Buyisela ikhophi egciniwe',restoreHelp:'Ukubuyisela kuvula Amafayela edivayisi yakho. Khetha FundiPocket_Library_Backup.json kokulandiwe noma lapho uyigcine khona.',empty:'Akukho kufunda okulondoloziwe okutholakele lapha.',saved:'Kulondolozwe ngaphandle kwe-inthanethi',study:'📖 Funda',share:'📲 Yabelana',save:'⬇️ Gcina',close:'✕ Vala',photosHeading:'Izithombe zebhodi / ikhasi / amanothi',summaryHeading:'✨ Isifinyezo',captured:'Ukufunda okugciniwe',qKey:'🧠 UMBONO OYINHLOKO — Ngamazwi akho, yimuphi umqondo owodwa obalulekile kulokhu kufunda?',qExplain:'🔎 CHAZA — Kungani noma kwenzeka kanjani lokhu? Chaza imbangela, isizathu noma inqubo eyodwa.',qDetail:'💡 KHUMBULA — Nikeza iqiniso noma imininingwane ebalulekile ofuna ukuyikhumbula kamuva.',qApply:'🌍 SEBENZISA — Lo mbono ungabaluleka kanjani empilweni yangempela, noma yisiphi isenzo esiwusizo ongasithatha?'},
-nso:{tag:'Mothuši wa go ithuta wa pele ka ntle ga inthanete • O diretšwe mafelo a data ya fase',capture:'📥 Boloka tše o ithutago tšona',pack:'✨ Sephuthelwana sa ka sa go Ithuta',library:'📚 Tše ke Ithutago Tšona',offline:'📴 Ka ntle ga inthanete',online:'🌐 Inthaneteng',offlineHelp:'Go ithuta ka ntle ga inthanete: dikakaretšo, diteko tša tsebo le tše di bolokilwego di dula mo sedirišweng se.',onlineHelp:'Thušo ya inthanete: kgokagano e gona, eupša tše o di bolokilego di sa dula mo sedirišweng se.',tiles:['BOLOKA','KAKARETŠO','LEKA TSEBO YA KA','TŠE KE ITHUTAGO TŠONA'],tileHelp:['Tsenya thuto, polelo, letlakala goba dintlha ka pokothong ya gago','Fetoša sengwalwa se se bolokilwego gore e be kakaretšo ye e kwagalago','Teko ye kopana ya bogwera go tšwa go tše o di bolokilego','Bula tše o di bolokilego, le ge o se na inthanete'],captureIntro:'Boloka thuto ye e nago le mohola ge o sa kgona go e hwetša, gomme o e boloke mo mogaleng wo gore o ithute ka yona ka morago. Diriša FundiPocket sekolong, dithutong tše dingwe, tlhahlong, mošomong goba go ithuteng ga letšatši le letšatši.',titlePh:'Fa thuto ye sehlogo se sekopana',notesPh:'Ngwala, kgomaretša goba oketša tše o ithutago tšona tše o nyakago go di boloka.',paste:'📋 Kgomaretša go tšwa clipboard',type:'⌨️ Ngwala dintlha tša ka',pasteHelp:'O ka gatelela wa swara ka gare ga lepokisi la dintlha gomme wa kgetha Kgomaretša.',photo:'📷 Tšea seswantšho sa boto / letlakala',audio:'🎙️ Rekhota modumo wa thuto',photos:'Diswantšho tše di letetšego:',audioLabel:'Modumo:',none:'Ga go na',make:'✨ Dira sephuthelwana sa ka sa go ithuta',packEmpty:'Boloka sengwalwa sa thuto ka godimo, gomme o kgotle Dira sephuthelwana sa ka sa go ithuta. Kakaretšo le teko ya tsebo di tla tšwelela mo.',yourSummary:'🌟 Kakaretšo ya gago',check:'🎯 Leka tsebo ya ka',checkHelp:'Teko ye kopana — ga se tlhahlobo. Diriša kakaretšo ge o nyaka thušo.',answers:'🎉 Lekola dikarabo tša ka',search:'🔍 Nyaka tše o di bolokilego...',backup:'🧰 Boloka khophi ya bokgobapuku',restore:'♻️ Bušetša khophi ye e bolokilwego',restoreHelp:'Go bušetša go bula Difaele tša sedirišwa sa gago. Kgetha FundiPocket_Library_Backup.json go Downloads goba moo o e bolokilego.',empty:'Ga go na thuto ye e bolokilwego ye e hweditšwego mo.',saved:'E bolokilwe ka ntle ga inthanete',study:'📖 Ithute',share:'📲 Abelana',save:'⬇️ Boloka',close:'✕ Tswalela',photosHeading:'Diswantšho tša boto / letlakala / dintlha',summaryHeading:'✨ Kakaretšo',captured:'Thuto ye e bolokilwego',qKey:'🧠 KGopolo YE KGOLO — Ka mantšu a gago, ke kgopolo efe e bohlokwa go tšwa thutong ye?',qExplain:'🔎 HLALOŠA — Ke ka baka la eng goba se direga bjang? Hlaloša lebaka, sebaki goba tshepedišo e tee.',qDetail:'💡 GOPOLA — Fa ntlha e tee e bohlokwa ye o nyakago go e gopola ka morago.',qApply:'🌍 DIRIŠA — Kgopolo ye e ka ba bohlokwa bjang bophelong, goba ke tiro efe ya mohola ye o ka e tšeago?'}
-};
-const runtimeMessages={
-en:{storageOpen:'FundiPocket could not open local storage. Check device storage and private browsing.',photoLimit:'You can attach up to 5 photos to one learning item.',shareLarge:'This shared file is larger than 8 MB. Ask the sender for a smaller learning bundle.',photoFail:'This photo could not be prepared. Please try another photo.',clipboardEmpty:'Your clipboard is empty. Copy some text first.',pasteHelp:'Press and hold inside the notes box, then choose Paste.',audioUnsupported:'Audio recording is not supported on this device/browser. You can still save notes and photos offline.',micRequired:'Microphone access is required for audio capture.',moreText:'Add a little more lesson text or notes first.',yourAnswer:'Your answer',quizMore:'Your summary is ready. Add a little more detailed lesson text to create the knowledge check.',excellent:'🌟 Excellent — you explained, remembered and applied the key learning.',good:'👏 Good understanding',keep:'💡 Keep learning — use the summary, then strengthen your answers.',storageWait:'Local storage is not ready yet. Please wait a moment and try again.',saveFail:'This learning item could not be saved. Please free some device storage and try again.',saveInterrupted:'Saving was interrupted. Your current capture has not been cleared; please try again.',backupLarge:'Backup is too large for the lightweight restore tool.',restored:'Library backup restored. Text learning has been added to this device.',restoreFail:'Restore failed. Check available storage and try again.',invalidBackup:'This is not a valid FundiPocket library backup.',readFail:'This file could not be read.',importFail:'This shared learning could not be imported. Check available device storage and try again.',imported:'Imported successfully'},
-af:{storageOpen:'FundiPocket kon nie plaaslike berging oopmaak nie. Kontroleer toestelberging en privaat blaai.',photoLimit:'Jy kan tot 5 foto’s aan een leeritem heg.',shareLarge:'Hierdie gedeelde lêer is groter as 8 MB. Vra vir ’n kleiner leerbundel.',photoFail:'Hierdie foto kon nie voorberei word nie. Probeer asseblief ’n ander foto.',clipboardEmpty:'Jou knipbord is leeg. Kopieer eers teks.',pasteHelp:'Druk en hou binne die notasblokkie en kies dan Plak.',audioUnsupported:'Oudio-opname word nie op hierdie toestel/blaaier ondersteun nie. Jy kan steeds notas en foto’s vanlyn stoor.',micRequired:'Mikrofoontoegang is nodig vir oudio-opname.',moreText:'Voeg eers ’n bietjie meer lesteks of notas by.',yourAnswer:'Jou antwoord',quizMore:'Jou opsomming is gereed. Voeg meer besonderhede by om die kennistoets te skep.',excellent:'🌟 Uitstekend — jy het die kernleer verduidelik, onthou en toegepas.',good:'👏 Goeie begrip',keep:'💡 Hou aan leer — gebruik die opsomming en versterk dan jou antwoorde.',storageWait:'Plaaslike berging is nog nie gereed nie. Wag ’n oomblik en probeer weer.',saveFail:'Hierdie leeritem kon nie gestoor word nie. Maak asseblief toestelberging beskikbaar en probeer weer.',saveInterrupted:'Stoor is onderbreek. Jou huidige vaslegging is nie uitgevee nie; probeer weer.',backupLarge:'Die rugsteun is te groot vir die liggewig herstelhulpmiddel.',restored:'Biblioteekrugsteun is herstel. Teksleer is by hierdie toestel gevoeg.',restoreFail:'Herstel het misluk. Kontroleer beskikbare berging en probeer weer.',invalidBackup:'Dit is nie ’n geldige FundiPocket-biblioteekrugsteun nie.',readFail:'Hierdie lêer kon nie gelees word nie.',importFail:'Hierdie gedeelde leeritem kon nie ingevoer word nie. Kontroleer toestelberging en probeer weer.',imported:'Suksesvol ingevoer'},
-xh:{storageOpen:'IFundiPocket ayikwazanga ukuvula ugcino lwesixhobo. Jonga indawo yokugcina kunye nokukhangela bucala.',photoLimit:'Ungancamathisela ukuya kutsho kwiifoto ezi-5 kwinto enye yokufunda.',shareLarge:'Le fayile kwabelwana ngayo ingaphezulu kwe-8 MB. Cela iphakheji yokufunda encinci.',photoFail:'Le foto ayikwazanga kulungiswa. Nceda uzame enye.',clipboardEmpty:'Ibhodi yakho yokukopa ayinanto. Khuphela umbhalo kuqala.',pasteHelp:'Cofa ubambe ngaphakathi kwebhokisi yamanqaku, uze ukhethe u-Ncamathisela.',audioUnsupported:'Ukurekhoda isandi akuxhaswanga kwesi sixhobo/isikhangeli. Usenokugcina amanqaku neefoto ngaphandle kwe-intanethi.',micRequired:'Ufikelelo kwimayikrofoni luyafuneka ukuze urekhode isandi.',moreText:'Yongeza umbhalo wesifundo okanye amanqaku angakumbi kuqala.',yourAnswer:'Impendulo yakho',quizMore:'Isishwankathelo sakho silungile. Yongeza iinkcukacha ezingakumbi ukuze wenze uvavanyo lolwazi.',excellent:'🌟 Kugqwesile — ucacisile, wakhumbula waza wasebenzisa okona kufundiweyo.',good:'👏 Ukuqonda kakuhle',keep:'💡 Qhubeka ufunda — sebenzisa isishwankathelo uze uphucule iimpendulo zakho.',storageWait:'Ugcino lwesixhobo alukalungi. Linda umzuzwana uzame kwakhona.',saveFail:'Le nto yokufunda ayikwazanga kugcinwa. Khulula indawo yokugcina uze uzame kwakhona.',saveInterrupted:'Ukugcina kuphazamisekile. Okubambileyo akucinywanga; zama kwakhona.',backupLarge:'Ugcino lokhuseleko lukhulu kakhulu kwisixhobo sokubuyisela esilula.',restored:'Ugcino lokhuseleko lwethala lubuyiselwe. Ukufunda okubhaliweyo kongezwe kwesi sixhobo.',restoreFail:'Ukubuyisela akuphumelelanga. Jonga indawo yokugcina uze uzame kwakhona.',invalidBackup:'Le ayisiyogcino lokhuseleko olusebenzayo lweFundiPocket.',readFail:'Le fayile ayikwazanga ukufundwa.',importFail:'Le nto yokufunda kwabelwana ngayo ayikwazanga ukungeniswa. Jonga ugcino uze uzame kwakhona.',imported:'Ingeniswe ngempumelelo'},
-zu:{storageOpen:'IFundiPocket ayikwazanga ukuvula isitoreji sedivayisi. Hlola indawo yokugcina nokuphequlula okuyimfihlo.',photoLimit:'Unganamathisela izithombe ezifika kwezi-5 entweni eyodwa yokufunda.',shareLarge:'Leli fayela okwabelwana ngalo lingaphezu kuka-8 MB. Cela iphakethe lokufunda elincane.',photoFail:'Lesi sithombe asikwazanga ukulungiswa. Sicela uzame esinye.',clipboardEmpty:'Ibhodi yakho yokukopisha ayinalutho. Kopisha umbhalo kuqala.',pasteHelp:'Cindezela ubambe ebhokisini lamanothi, bese ukhetha Namathisela.',audioUnsupported:'Ukuqopha umsindo akusekelwa kule divayisi/isiphequluli. Usengagcina amanothi nezithombe ungaxhunyiwe ku-inthanethi.',micRequired:'Ukufinyelela kumakrofoni kuyadingeka ukuze uqophe umsindo.',moreText:'Faka umbhalo wesifundo noma amanothi athe xaxa kuqala.',yourAnswer:'Impendulo yakho',quizMore:'Isifinyezo sakho sesilungile. Faka imininingwane eyengeziwe ukuze wakhe ukuhlolwa kolwazi.',excellent:'🌟 Kuhle kakhulu — uchazile, wakhumbula futhi wasebenzisa okufundile.',good:'👏 Ukuqonda okuhle',keep:'💡 Qhubeka ufunda — sebenzisa isifinyezo bese uqinisa izimpendulo zakho.',storageWait:'Isitoreji sedivayisi asikalungi. Linda kancane bese uzama futhi.',saveFail:'Le nto yokufunda ayikwazanga ukugcinwa. Khulula indawo yokugcina bese uzama futhi.',saveInterrupted:'Ukugcina kuphazamisekile. Okubambile akusuliwe; zama futhi.',backupLarge:'Isipele sikhulu kakhulu ethuluzini lokubuyisela elilula.',restored:'Isipele somtapo sibuyiselwe. Ukufunda kombhalo kungezwe kule divayisi.',restoreFail:'Ukubuyisela kuhlulekile. Hlola isitoreji bese uzama futhi.',invalidBackup:'Lesi akusona isipele esivumelekile somtapo weFundiPocket.',readFail:'Leli fayela alikwazanga ukufundwa.',importFail:'Lokhu kufunda okwabelwana ngakho akukwazanga ukungeniswa. Hlola isitoreji bese uzama futhi.',imported:'Kungeniswe ngempumelelo'},
-nso:{storageOpen:'FundiPocket ga se ya kgona go bula polokelo ya sedirišwa. Lekola sebaka sa polokelo le go phetla ka sephiring.',photoLimit:'O ka kgomaretša diswantšho tše 5 go thuto e tee.',shareLarge:'Faele ye e abelanwego e feta 8 MB. Kgopela sephuthelwana se senyenyane sa go ithuta.',photoFail:'Seswantšho se ga se a kgona go lokišwa. Hle leka se sengwe.',clipboardEmpty:'Clipboard ya gago ga e na selo. Kopiša sengwalwa pele.',pasteHelp:'Gatelela o sware ka lepokising la dintlha, gomme o kgethe Paste.',audioUnsupported:'Go rekota modumo ga go thekgwe mo sedirišweng/sefetleking se. O sa kgona go boloka dintlha le diswantšho ntle le inthanete.',micRequired:'Phihlelelo ya maekrofounu e a nyakega go rekota modumo.',moreText:'Tsenya sengwalwa sa thuto goba dintlha tše dingwe pele.',yourAnswer:'Karabo ya gago',quizMore:'Kakaretšo ya gago e lokile. Tsenya dintlha tše dingwe go hlama tekolo ya tsebo.',excellent:'🌟 O šomile gabotse kudu — o hlalošitše, wa gopola gomme wa diriša thuto ya bohlokwa.',good:'👏 Kwešišo e botse',keep:'💡 Tšwela pele o ithuta — diriša kakaretšo gomme o matlafatše dikarabo tša gago.',storageWait:'Polokelo ya sedirišwa ga se ya loka. Ema gannyane gomme o leke gape.',saveFail:'Thuto ye ga se ya kgona go bolokwa. Lokolla sebaka sa polokelo gomme o leke gape.',saveInterrupted:'Go boloka go šitišitšwe. Tše o di bolokilego ga se tša phumolwa; leka gape.',backupLarge:'Backup e kgolo kudu bakeng sa sedirišwa se bonolo sa go bušetša.',restored:'Backup ya bokgobapuku e bušeditšwe. Thuto ya sengwalwa e okeditšwe mo sedirišweng.',restoreFail:'Go bušetša go paletšwe. Lekola polokelo gomme o leke gape.',invalidBackup:'Ye ga se backup ya bokgobapuku bja FundiPocket ye e šomago.',readFail:'Faele ye ga se ya kgona go balwa.',importFail:'Thuto ye e abelanwego ga se ya kgona go tsenywa. Lekola polokelo gomme o leke gape.',imported:'E tsentšwe ka katlego'}
-};
-function rm(key){const d=runtimeMessages[currentLanguage]||runtimeMessages.en;return d[key]||runtimeMessages.en[key]||key;}
-const systemTranslations={
-en:{language:'LANGUAGE',light:'Light',dark:'Dark',offlineReady:'OFFLINE SHELL: READY',offlineCheck:'OFFLINE SHELL: CHECK',offlineLimited:'OFFLINE SHELL: LIMITED',storageReady:'LOCAL STORAGE: READY',networkAvailable:'NETWORK: AVAILABLE',networkOffline:'NETWORK: OFFLINE',storagePool:'Storage Pool:',safeQuota:'Safe Quota:'},
-af:{language:'TAAL',light:'Lig',dark:'Donker',offlineReady:'VANLYN-DOP: GEREED',offlineCheck:'VANLYN-DOP: KONTROLEER',offlineLimited:'VANLYN-DOP: BEPERK',storageReady:'PLAASLIKE BERGING: GEREED',networkAvailable:'NETWERK: BESKIKBAAR',networkOffline:'NETWERK: VANLYN',storagePool:'Berging gebruik:',safeQuota:'Veilige kwota:'},
-xh:{language:'ULWIMI',light:'Khanya',dark:'Mnyama',offlineReady:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KULUNGILE',offlineCheck:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KUYAHLOLWA',offlineLimited:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KUNOMDA',storageReady:'UGCINO LWESIXHOBO: LULUNGILE',networkAvailable:'INETHIWEKHI: IYAFUMANEKA',networkOffline:'INETHIWEKHI: AYIKHO',storagePool:'Ugcino olusetyenzisiweyo:',safeQuota:'Umda okhuselekileyo:'},
-zu:{language:'ULIMI',light:'Khanya',dark:'Mnyama',offlineReady:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KULUNGILE',offlineCheck:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KUYAHLOLWA',offlineLimited:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KUNOMKHAWULO',storageReady:'UKUGCINA KWEDIVAYISI: KULUNGILE',networkAvailable:'INETHIWEKHI: IYATHOLAKALA',networkOffline:'INETHIWEKHI: AYIKHO',storagePool:'Isitoreji esisetshenzisiwe:',safeQuota:'Umkhawulo ophephile:'},
-nso:{language:'LELEME',light:'Seetša',dark:'Leswiswi',offlineReady:'KA NTLE GA INTHANETE: GO LOKILE',offlineCheck:'KA NTLE GA INTHANETE: GO A LEKOLWA',offlineLimited:'KA NTLE GA INTHANETE: GO NA LE MOEDI',storageReady:'POLOKELO YA SEDIRIŠWA: GO LOKILE',networkAvailable:'NETEWEKE: E GONA',networkOffline:'NETEWEKE: GA E GONA',storagePool:'Polokelo ye e dirišitšwego:',safeQuota:'Moedi wa polokego:'}
-};
-let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
-let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
-function setTxt(sel,txt){const e=document.querySelector(sel);if(e)e.textContent=txt;}
-function applyLanguageToInterface(){
- const d=uiTranslations[currentLanguage]||uiTranslations.en; const s=systemTranslations[currentLanguage]||systemTranslations.en;
- document.documentElement.lang=currentLanguage;
- const languageLabel=document.querySelector('section[aria-label="Language and learning mode"] > div:first-child'); if(languageLabel) languageLabel.textContent=s.language;
- const tele=document.querySelector('.telemetry-card'); if(tele){const ds=tele.querySelectorAll(':scope > div'); if(ds[0])ds[0].childNodes[0].nodeValue=s.storagePool+' '; if(ds[1])ds[1].childNodes[0].nodeValue=s.safeQuota+' ';}
- setTxt('#brandTagline',d.tag); setTxt('#captureHeading',d.capture); setTxt('#packHeading',d.pack); setTxt('#libraryHeading',d.library);
- document.querySelectorAll('.bento-tile').forEach((e,i)=>{const s=e.querySelector('strong'),m=e.querySelector('small');if(s)s.textContent=d.tiles[i];if(m)m.textContent=d.tileHelp[i];});
- const cap=document.querySelector('#captureSection > p'); if(cap)cap.textContent=d.captureIntro;
- const title=document.getElementById('lessonTitle'),notes=document.getElementById('lessonNotes'),search=document.getElementById('searchInput');
- if(title)title.placeholder=d.titlePh;if(notes)notes.placeholder=d.notesPh;if(search)search.placeholder=d.search;
- const capBtns=document.querySelectorAll('#captureSection .btn-grid:first-of-type .btn'); if(capBtns[0])capBtns[0].textContent=d.paste;if(capBtns[1])capBtns[1].textContent=d.type;
- setTxt('#pasteHelp',d.pasteHelp);
- const mediaBtns=document.querySelectorAll('#captureSection .btn-grid:nth-of-type(2) .btn'); if(mediaBtns[0]){const inp=mediaBtns[0].querySelector('input');mediaBtns[0].textContent=d.photo;if(inp)mediaBtns[0].appendChild(inp);} if(mediaBtns[1])mediaBtns[1].textContent=d.audio;
- const cs=document.getElementById('captureSummary'); if(cs)cs.innerHTML=d.photos+' <span id="photoCountBadge">'+queuedPhotos.length+'</span>/5 | '+d.audioLabel+' <span id="audioStatusBadge">'+(recordedAudioBlob?'✓':d.none)+'</span>';
- const saveBtn=document.querySelector('#captureSection > .btn-save');if(saveBtn)saveBtn.textContent=d.make;
- const pe=document.getElementById('packEmpty');if(pe)pe.textContent=d.packEmpty;
- const pc=document.getElementById('packContent');if(pc){const heads=pc.querySelectorAll('div[style*="font-weight:900"]');if(heads[0])heads[0].textContent=d.yourSummary;if(heads[1])heads[1].textContent=d.check;const help=pc.querySelector('div[style*="font-size:.8rem"]');if(help)help.textContent=d.checkHelp;const ans=pc.querySelector('button');if(ans)ans.textContent=d.answers;}
- const libBtns=document.querySelectorAll('#librarySection .btn-grid .btn');if(libBtns[0])libBtns[0].textContent=d.backup;if(libBtns[1]){const inp=libBtns[1].querySelector('input');libBtns[1].textContent=d.restore;if(inp)libBtns[1].appendChild(inp);}
- const libHelp=document.querySelector('#librarySection .btn-grid + div');if(libHelp)libHelp.textContent=d.restoreHelp;
- document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
- updateLearningModeUI(); updateThemeButtonLabel(document.documentElement.getAttribute('data-theme')||'dark');
- if(db) renderLessons(allLessonsCache);
-}
-function setLanguage(lang){currentLanguage=uiTranslations[lang]?lang:'en';localStorage.setItem('fundipocket_lang',currentLanguage);applyLanguageToInterface();}
-function updateLearningModeUI(){const d=uiTranslations[currentLanguage]||uiTranslations.en;const online=learningMode==='online';document.getElementById('modeToggleBtn').textContent=online?d.online:d.offline;document.getElementById('modeHelp').textContent=online?d.onlineHelp:d.offlineHelp;}
-function toggleLearningMode(){learningMode=learningMode==='offline'?'online':'offline';localStorage.setItem('fundipocket_mode',learningMode);updateLearningModeUI();}
-setLanguage(currentLanguage);
+      en:{tag:'Offline-First Learning Companion • Built for Low-Data Environments',capture:'📥 Capture your learning',pack:'✨ My Learning Pack',library:'📚 My Learning',offline:'📴 Offline',online:'🌐 Online',offlineHelp:'Offline Learning: summaries, checks and saved learning stay on this device.',onlineHelp:'Online Assist: connectivity is available, while your saved learning still stays on this device.'},
+      af:{tag:'Vanlyn-eerste leermaat • Gebou vir lae-data omgewings',capture:'📥 Vang jou leerwerk vas',pack:'✨ My Leerpak',library:'📚 My Leerwerk',offline:'📴 Vanlyn',online:'🌐 Aanlyn',offlineHelp:'Vanlyn leer: opsommings, kennistoetse en gestoorde leerwerk bly op hierdie toestel.',onlineHelp:'Aanlyn hulp: verbinding is beskikbaar, terwyl gestoorde leerwerk steeds op hierdie toestel bly.'},
+      xh:{tag:'Umncedisi wokufunda osebenza ngaphandle kwe-intanethi • Wenzelwe ukusetyenziswa kwedatha encinci',capture:'📥 Gcina okufundayo',pack:'✨ Ipakethi Yam Yokufunda',library:'📚 Izifundo Zam',offline:'📴 Ngaphandle kwe-intanethi',online:'🌐 Kwi-intanethi',offlineHelp:'Ukufunda ngaphandle kwe-intanethi: izishwankathelo, iimvavanyo nolwazi olugciniweyo luhlala kwesi sixhobo.',onlineHelp:'Uncedo lwe-intanethi: unxibelelwano luyafumaneka, kodwa izifundo zakho ezigciniweyo zihlala kwesi sixhobo.'},
+      zu:{tag:'Umsizi wokufunda osebenza ngaphandle kwe-inthanethi • Wakhelwe indawo enedatha encane',capture:'📥 Gcina okufundayo',pack:'✨ Iphakethe Lami Lokufunda',library:'📚 Ukufunda Kwami',offline:'📴 Ngaphandle kwe-inthanethi',online:'🌐 Ku-inthanethi',offlineHelp:'Ukufunda ngaphandle kwe-inthanethi: izifinyezo, ukuhlolwa kolwazi nokufunda okulondoloziwe kuhlala kule divayisi.',onlineHelp:'Usizo lwe-inthanethi: ukuxhumeka kuyatholakala, kodwa ukufunda okulondoloziwe kusahlala kule divayisi.'},
+      nso:{tag:'Mothuši wa go ithuta wa pele ka ntle ga inthanete • O diretšwe mafelo a data ya fase',capture:'📥 Boloka tše o ithutago tšona',pack:'✨ Sephuthelwana sa ka sa go Ithuta',library:'📚 Tše ke Ithutago Tšona',offline:'📴 Ka ntle ga inthanete',online:'🌐 Inthaneteng',offlineHelp:'Go ithuta ka ntle ga inthanete: dikakaretšo, diteko tša tsebo le tše di bolokilwego di dula mo sedirišweng se.',onlineHelp:'Thušo ya inthanete: kgokagano e gona, eupša tše o di bolokilego di sa dula mo sedirišweng se.'}
+    };
+    let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
+    let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
+    function setLanguage(lang){
+      currentLanguage=uiTranslations[lang]?lang:'en'; localStorage.setItem('fundipocket_lang',currentLanguage);
+      const d=uiTranslations[currentLanguage];
+      document.documentElement.lang=currentLanguage;
+      document.getElementById('brandTagline').textContent=d.tag;
+      document.getElementById('captureHeading').textContent=d.capture;
+      document.getElementById('packHeading').textContent=d.pack;
+      document.getElementById('libraryHeading').textContent=d.library;
+      document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
+      updateLearningModeUI();
+    }
+    function updateLearningModeUI(){
+      const d=uiTranslations[currentLanguage]||uiTranslations.en;
+      const online=learningMode==='online';
+      document.getElementById('modeToggleBtn').textContent=online?d.online:d.offline;
+      document.getElementById('modeHelp').textContent=online?d.onlineHelp:d.offlineHelp;
+    }
+    function toggleLearningMode(){
+      learningMode=learningMode==='offline'?'online':'offline';
+      localStorage.setItem('fundipocket_mode',learningMode); updateLearningModeUI();
+    }
+    // Apply the learner's saved language and mode to the visible controls.
+    setLanguage(currentLanguage);
     /* OFFLINE LEARNING PACK — captured text only; no network call */
     let currentQuiz = [];
     let learningPackBusy = false;
@@ -605,23 +585,23 @@ setLanguage(currentLanguage);
       const detail=strongest.find(x=>x!==main&&x!==causal)||scored[Math.min(1,scored.length-1)]||main;
       const application=scored.find(x=>/(should|can help|avoid|protect|use|action|practical|need)/i.test(x.sentence))||strongest[strongest.length-1]||main;
       const qs=[
-        {type:'key',question:(uiTranslations[currentLanguage]||uiTranslations.en).qKey,answer:main.sentence,keywords:main.terms},
-        {type:'explain',question:(uiTranslations[currentLanguage]||uiTranslations.en).qExplain,answer:causal.sentence,keywords:causal.terms},
-        {type:'detail',question:(uiTranslations[currentLanguage]||uiTranslations.en).qDetail,answer:detail.sentence,keywords:detail.terms},
-        {type:'apply',question:(uiTranslations[currentLanguage]||uiTranslations.en).qApply,answer:application.sentence,keywords:application.terms}
+        {type:'key',question:'🧠 KEY IDEA — In your own words, what is one important idea from this learning?',answer:main.sentence,keywords:main.terms},
+        {type:'explain',question:'🔎 EXPLAIN — Why or how does this happen? Explain one cause, reason or process from the learning.',answer:causal.sentence,keywords:causal.terms},
+        {type:'detail',question:'💡 REMEMBER — Give one important fact or detail you would want to remember later.',answer:detail.sentence,keywords:detail.terms},
+        {type:'apply',question:'🌍 APPLY — How could this idea matter in real life, or what useful action can you take from it?',answer:application.sentence,keywords:application.terms}
       ];
       return qs;
     }
     function buildLearningPack() {
       if (learningPackBusy) return;
       const text=document.getElementById('lessonNotes').value.trim();
-      if(text.length<80){ alert(rm('moreText')); return; }
+      if(text.length<80){ alert('Add a little more of the lesson text or notes first so FundiPocket has enough material to make a useful learning pack.'); return; }
       learningPackBusy = true;
       const summary=makeOfflineSummary(text); currentQuiz=makeKnowledgeCheck(text);
       document.getElementById('generatedSummary').textContent=summary;
       const area=document.getElementById('quizArea'); area.innerHTML='';
-      currentQuiz.forEach((q,i)=>{ const wrap=document.createElement('div'); wrap.style.margin='10px 0'; const label=document.createElement('div'); label.style.cssText='font-weight:700;line-height:1.45;margin-bottom:6px'; label.textContent=(i+1)+'. '+q.question; const input=document.createElement('input'); input.id='quizAnswer'+i; input.placeholder=rm('yourAnswer'); input.autocomplete='off'; wrap.append(label,input); area.appendChild(wrap); });
-      if(!currentQuiz.length) area.innerHTML='<div style="font-size:.85rem;color:var(--text-muted)">'+rm('quizMore')+'</div>';
+      currentQuiz.forEach((q,i)=>{ const wrap=document.createElement('div'); wrap.style.margin='10px 0'; const label=document.createElement('div'); label.style.cssText='font-weight:700;line-height:1.45;margin-bottom:6px'; label.textContent=(i+1)+'. '+q.question; const input=document.createElement('input'); input.id='quizAnswer'+i; input.placeholder='Your answer'; input.autocomplete='off'; wrap.append(label,input); area.appendChild(wrap); });
+      if(!currentQuiz.length) area.innerHTML='<div style="font-size:.85rem;color:var(--text-muted)">Your summary is ready. Add a little more detailed lesson text to create the knowledge check.</div>';
       document.getElementById('packEmpty').style.display='none'; document.getElementById('packContent').style.display='block'; document.getElementById('quizResult').textContent='';
       saveActiveLesson(summary,currentQuiz); goToSection('learningPackSection');
     }
@@ -641,15 +621,15 @@ setLanguage(currentLanguage);
         else feedback.push('Question '+(i+1)+': Review this idea — '+q.answer);
       });
       const r=document.getElementById('quizResult');
-      if(strong===currentQuiz.length) r.textContent=rm('excellent');
-      else if(strong>=Math.ceil(currentQuiz.length/2)) r.textContent=rm('good')+' — '+strong+' / '+currentQuiz.length+'. '+feedback.join(' ');
-      else r.textContent=rm('keep')+' '+feedback.join(' ');
+      if(strong===currentQuiz.length) r.textContent='🌟 Excellent — you explained, remembered and applied the key learning.';
+      else if(strong>=Math.ceil(currentQuiz.length/2)) r.textContent='👏 Good understanding — '+strong+' of '+currentQuiz.length+' responses are strong. '+feedback.join(' ');
+      else r.textContent='💡 Keep learning — use the summary, then strengthen your answers. '+feedback.join(' ');
     }
 
     /* SAVE LESSON */
     function saveActiveLesson(summary = '', quiz = []) {
       if (!db) {
-        alert(rm('storageWait'));
+        alert('Local storage is not ready yet. Please wait a moment and try again.');
         return;
       }
       const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Learning';
@@ -665,10 +645,10 @@ setLanguage(currentLanguage);
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').add(record);
       tx.onerror = () => {
-        alert(rm('saveFail'));
+        alert('This learning item could not be saved. Please free some device storage and try again.');
       };
       tx.onabort = () => {
-        alert(rm('saveInterrupted'));
+        alert('Saving was interrupted. Your current capture has not been cleared; please try again.');
       };
       tx.oncomplete = () => {
         queuedPhotos = [];
@@ -704,7 +684,7 @@ setLanguage(currentLanguage);
       const container = document.getElementById('lessonsList');
       container.innerHTML = '';
       if (list.length === 0) {
-        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">'+escapeHTML((uiTranslations[currentLanguage]||uiTranslations.en).empty)+'</div>';
+        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No saved learning found in this view.</div>';
         return;
       }
       list.forEach(l => {
@@ -712,15 +692,15 @@ setLanguage(currentLanguage);
         div.className = 'lesson-card';
         div.innerHTML = `
           <div class="lesson-meta">
-            <span class="faculty-tag">${escapeHTML((uiTranslations[currentLanguage]||uiTranslations.en).saved)}</span>
+            <span class="faculty-tag">Saved Offline</span>
             <span style="color:var(--text-muted); font-size:0.75rem;">${escapeHTML(l.date)}</span>
           </div>
           <div class="lesson-title">${escapeHTML(l.title)}</div>
           <div style="font-size:0.78rem; color:var(--text-muted);">${escapeHTML((l.notes || '').substring(0, 75))}...</div>
           <div class="lesson-actions">
-            <button class="btn-action btn-read" onclick="openStudyModal(${l.id})">${escapeHTML((uiTranslations[currentLanguage]||uiTranslations.en).study)}</button>
-            <button class="btn-action btn-share" onclick="shareLessonBundle(${l.id})">${escapeHTML((uiTranslations[currentLanguage]||uiTranslations.en).share)}</button>
-            <button class="btn-action btn-download" onclick="downloadLessonBundle(${l.id})">${escapeHTML((uiTranslations[currentLanguage]||uiTranslations.en).save)}</button>
+            <button class="btn-action btn-read" onclick="openStudyModal(${l.id})">📖 Study</button>
+            <button class="btn-action btn-share" onclick="shareLessonBundle(${l.id})">📲 Share</button>
+            <button class="btn-action btn-download" onclick="downloadLessonBundle(${l.id})">⬇️ Save</button>
             <button class="btn-action btn-delete" onclick="deleteLesson(${l.id})">🗑️</button>
           </div>
         `;
@@ -794,7 +774,7 @@ setLanguage(currentLanguage);
     function restoreLibraryBackup(event) {
       const file = event.target.files[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) { alert(rm('backupLarge')); event.target.value=''; return; }
+      if (file.size > 2 * 1024 * 1024) { alert('Backup is too large for the lightweight restore tool.'); event.target.value=''; return; }
       const reader = new FileReader();
       reader.onload = () => {
         try {
@@ -816,11 +796,11 @@ setLanguage(currentLanguage);
             photos: [], audio: null,
             date: String(item.date || new Date().toLocaleDateString('en-ZA')).slice(0,80)
           }));
-          tx.oncomplete = () => { event.target.value=''; loadLessons(); refreshTelemetry(); alert(rm('restored')); };
-          tx.onerror = () => alert(rm('restoreFail'));
-        } catch (e) { event.target.value=''; alert(rm('invalidBackup')); }
+          tx.oncomplete = () => { event.target.value=''; loadLessons(); refreshTelemetry(); alert('Library backup restored. Text learning has been added to this device.'); };
+          tx.onerror = () => alert('Restore failed. Check available storage and try again.');
+        } catch (e) { event.target.value=''; alert('This is not a valid FundiPocket library backup.'); }
       };
-      reader.onerror = () => { event.target.value=''; alert(rm('readFail')); };
+      reader.onerror = () => { event.target.value=''; alert('Backup file could not be read.'); };
       reader.readAsText(file);
     }
 
@@ -902,17 +882,17 @@ setLanguage(currentLanguage);
           audio: null,
           date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
         });
-        tx.onerror = () => alert(rm('importFail'));
+        tx.onerror = () => alert('This shared learning could not be imported. Check available device storage and try again.');
         tx.oncomplete = () => {
           event.target.value = '';
-          alert(rm('imported')+': '+title);
+          alert(`Imported successfully: ${title}`);
           refreshTelemetry();
           loadLessons();
         };
       };
       reader.onerror = () => {
         event.target.value = '';
-        alert(rm('readFail'));
+        alert('This shared file could not be read.');
       };
       reader.readAsText(file);
     }
