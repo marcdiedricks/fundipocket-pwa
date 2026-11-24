@@ -86,6 +86,17 @@
       display: block;
     }
 
+    /* BENTO / METRO HOME ACTIONS */
+    .bento-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .bento-tile { min-height:92px; border:1px solid var(--border); border-radius:12px; background:var(--card-bg); color:var(--text); padding:14px; display:flex; flex-direction:column; justify-content:space-between; text-align:left; cursor:pointer; }
+    .bento-tile strong { font-size:1rem; }
+    .bento-tile small { color:var(--text-muted); line-height:1.25; }
+    .bento-icon { font-size:1.45rem; }
+    .status-strip { display:flex; gap:6px; flex-wrap:wrap; font-size:.72rem; }
+    .status-pill { border:1px solid var(--border); background:var(--card-alt); border-radius:999px; padding:5px 8px; color:var(--text-muted); }
+    .status-pill.ok { color:var(--accent); }
+    .section-anchor { scroll-margin-top:12px; }
+
     /* CARDS & INPUTS */
     .card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .card h2 { font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
@@ -173,19 +184,32 @@
       </button>
     </header>
 
+    <!-- SIMPLE BENTO HOME: core actions stay available without a heavy framework -->
+    <nav class="bento-grid" aria-label="FundiPocket main actions">
+      <button class="bento-tile" onclick="goToSection('captureSection')"><span class="bento-icon">✍️</span><strong>CAPTURE</strong><small>Notes, board/page photo or learning audio</small></button>
+      <button class="bento-tile" onclick="goToSection('librarySection')"><span class="bento-icon">📚</span><strong>MY LEARNING</strong><small>Find and open learning saved on this phone</small></button>
+      <button class="bento-tile" onclick="document.getElementById('importFileInput').click()"><span class="bento-icon">📥</span><strong>RECEIVE</strong><small>Import learning shared by another person</small></button>
+      <button class="bento-tile" onclick="goToSection('librarySection')"><span class="bento-icon">📤</span><strong>SHARE</strong><small>Open My Learning and choose an item to share</small></button>
+    </nav>
+    <div class="status-strip" aria-label="App status">
+      <span class="status-pill ok" id="offlineReadyPill">OFFLINE READY: CHECKING</span>
+      <span class="status-pill">LOCAL STORAGE</span>
+      <span class="status-pill">LOW-DATA</span>
+    </div>
+
     <!-- STORAGE TELEMETRY & IMPORT -->
     <div class="telemetry-card">
       <div>Storage Pool: <span class="badge-quota" id="storageUsage">0.0 MB</span></div>
       <div>Safe Quota: <span class="badge-quota" id="storageQuota">10240 MB</span></div>
     </div>
 
-    <label class="import-btn-label">
+    <label class="import-btn-label" style="display:none;">
       📥 Receive Shared Learning (.html)
       <input type="file" accept=".html,text/html" id="importFileInput" style="display:none;" onchange="importSharedLesson(event)">
     </label>
 
     <!-- CAPTURE FORM -->
-    <section class="card">
+    <section class="card section-anchor" id="captureSection">
       <h2>✍️ Capture Learning</h2>
       
       <select id="stageSelect" aria-label="Learning stage">
@@ -229,7 +253,7 @@
     </section>
 
     <!-- SAVED LESSONS & SEARCH -->
-    <section class="card">
+    <section class="card section-anchor" id="librarySection">
       <h2>📚 My Learning</h2>
       <input type="text" id="searchInput" placeholder="🔍 Search subject, topic, formula, or notes..." oninput="filterLessons()">
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
@@ -241,14 +265,14 @@
   <!-- FULLSCREEN STUDY READER MODAL -->
   <div id="studyModal">
     <div class="modal-header">
-      <span class="faculty-tag" id="modalFaculty">Faculty</span>
+      <span class="faculty-tag" id="modalFaculty">Learning Area</span>
       <button class="modal-close" onclick="closeStudyModal()">✕ Close</button>
     </div>
-    <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Lecture Title</h1>
+    <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Learning Topic</h1>
     <div style="font-size:0.8rem; color:var(--text-muted);" id="modalDate">Captured Date</div>
     <div id="modalAudioSection"></div>
     <div class="card" style="margin-top:8px;">
-      <h3 style="font-size:0.95rem; color:var(--accent);">Whiteboard Slides</h3>
+      <h3 style="font-size:0.95rem; color:var(--accent);">Board / Page / Note Photos</h3>
       <div id="modalImagesContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
     </div>
     <div class="card">
@@ -258,6 +282,20 @@
   </div>
 
   <script>
+    function goToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    window.addEventListener('load', () => {
+      const pill = document.getElementById('offlineReadyPill');
+      if (!pill) return;
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE READY'; }).catch(() => { pill.textContent = 'OFFLINE: CHECK SETUP'; });
+      } else {
+        pill.textContent = 'OFFLINE: LIMITED';
+      }
+    });
+
     /* THEME SWITCHER ENGINE */
     function initTheme() {
       const saved = localStorage.getItem('fundi_theme') || 'dark';
