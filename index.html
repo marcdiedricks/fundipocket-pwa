@@ -199,7 +199,7 @@
     <header>
       <div class="brand">
         <h1>FundiPocket</h1>
-        <p>Offline-First Learning Companion • Built for Low-Data Environments</p>
+        <p id="brandTagline">Offline-First Learning Companion • Built for Low-Data Environments</p>
       </div>
       <button class="theme-btn" id="themeToggleBtn" onclick="toggleAppTheme()">
         🌙 Dark
@@ -232,7 +232,7 @@
 
     <!-- CAPTURE FORM -->
     <section class="card section-anchor" id="captureSection">
-      <h2>📥 Capture your learning</h2>
+      <h2 id="captureHeading">📥 Capture your learning</h2>
       <p style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">Capture useful learning while you have access to it, then keep it on this phone for later. Use FundiPocket for school, further study, training, work or everyday learning.</p>
       
       <input type="text" id="lessonTitle" maxlength="160" placeholder="Give this learning a short title">
@@ -261,7 +261,7 @@
     </section>
 
     <section class="card section-anchor" id="learningPackSection">
-      <h2>✨ My Learning Pack</h2>
+      <h2 id="packHeading">✨ My Learning Pack</h2>
       <div id="packEmpty" style="font-size:.86rem;color:var(--text-muted);line-height:1.5;">Capture lesson text above, then tap <strong>Make My Learning Pack</strong>. Your summary and short knowledge check will appear here.</div>
       <div id="packContent" style="display:none;">
         <div style="background:#eaf9f4;border:1px solid #bdebdc;border-radius:16px;padding:14px;margin-bottom:12px;"><div style="font-weight:900;color:#087f63;margin-bottom:8px;">🌟 Your Summary</div><div id="generatedSummary" style="line-height:1.6;white-space:pre-wrap;"></div></div>
@@ -271,7 +271,7 @@
 
     <!-- SAVED LESSONS & SEARCH -->
     <section class="card section-anchor" id="librarySection">
-      <h2>📚 My Learning</h2>
+      <h2 id="libraryHeading">📚 My Learning</h2>
       <input type="text" id="searchInput" placeholder="🔍 Search your saved learning..." oninput="filterLessons()">
       <div class="btn-grid">
         <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
@@ -506,6 +506,35 @@
       }
     }
 
+    const uiTranslations={
+      en:{tag:'Offline-First Learning Companion • Built for Low-Data Environments',capture:'📥 Capture your learning',pack:'✨ My Learning Pack',library:'📚 My Learning',offline:'📴 Offline',online:'🌐 Online',offlineHelp:'Offline Learning: summaries, checks and saved learning stay on this device.',onlineHelp:'Online Assist: connectivity is available, while your saved learning still stays on this device.'},
+      af:{tag:'Vanlyn-eerste leermaat • Gebou vir lae-data omgewings',capture:'📥 Vang jou leerwerk vas',pack:'✨ My Leerpak',library:'📚 My Leerwerk',offline:'📴 Vanlyn',online:'🌐 Aanlyn',offlineHelp:'Vanlyn leer: opsommings, kennistoetse en gestoorde leerwerk bly op hierdie toestel.',onlineHelp:'Aanlyn hulp: verbinding is beskikbaar, terwyl gestoorde leerwerk steeds op hierdie toestel bly.'},
+      xh:{tag:'Umncedisi wokufunda osebenza ngaphandle kwe-intanethi • Wenzelwe ukusetyenziswa kwedatha encinci',capture:'📥 Gcina okufundayo',pack:'✨ Ipakethi Yam Yokufunda',library:'📚 Izifundo Zam',offline:'📴 Ngaphandle kwe-intanethi',online:'🌐 Kwi-intanethi',offlineHelp:'Ukufunda ngaphandle kwe-intanethi: izishwankathelo, iimvavanyo nolwazi olugciniweyo luhlala kwesi sixhobo.',onlineHelp:'Uncedo lwe-intanethi: unxibelelwano luyafumaneka, kodwa izifundo zakho ezigciniweyo zihlala kwesi sixhobo.'},
+      zu:{tag:'Umsizi wokufunda osebenza ngaphandle kwe-inthanethi • Wakhelwe indawo enedatha encane',capture:'📥 Gcina okufundayo',pack:'✨ Iphakethe Lami Lokufunda',library:'📚 Ukufunda Kwami',offline:'📴 Ngaphandle kwe-inthanethi',online:'🌐 Ku-inthanethi',offlineHelp:'Ukufunda ngaphandle kwe-inthanethi: izifinyezo, ukuhlolwa kolwazi nokufunda okulondoloziwe kuhlala kule divayisi.',onlineHelp:'Usizo lwe-inthanethi: ukuxhumeka kuyatholakala, kodwa ukufunda okulondoloziwe kusahlala kule divayisi.'}
+    };
+    let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
+    let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
+    function setLanguage(lang){
+      currentLanguage=uiTranslations[lang]?lang:'en'; localStorage.setItem('fundipocket_lang',currentLanguage);
+      const d=uiTranslations[currentLanguage];
+      document.documentElement.lang=currentLanguage;
+      document.getElementById('brandTagline').textContent=d.tag;
+      document.getElementById('captureHeading').textContent=d.capture;
+      document.getElementById('packHeading').textContent=d.pack;
+      document.getElementById('libraryHeading').textContent=d.library;
+      document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
+      updateLearningModeUI();
+    }
+    function updateLearningModeUI(){
+      const d=uiTranslations[currentLanguage]||uiTranslations.en;
+      const online=learningMode==='online';
+      document.getElementById('modeToggleBtn').textContent=online?d.online:d.offline;
+      document.getElementById('modeHelp').textContent=online?d.onlineHelp:d.offlineHelp;
+    }
+    function toggleLearningMode(){
+      learningMode=learningMode==='offline'?'online':'offline';
+      localStorage.setItem('fundipocket_mode',learningMode); updateLearningModeUI();
+    }
     /* OFFLINE LEARNING PACK — captured text only; no network call */
     let currentQuiz = [];
     let learningPackBusy = false;
@@ -522,20 +551,27 @@
       const ranked = sentences.map((s,i)=>({s:s.trim(),i,score:normaliseWords(s).reduce((n,w)=>n+(freq[w]||0),0)/Math.max(1,s.length/35)})).filter(x=>x.s.length>20).sort((a,b)=>b.score-a.score).slice(0,Math.min(5,Math.max(2,Math.ceil(sentences.length*.35)))).sort((a,b)=>a.i-b.i);
       return ranked.length ? ranked.map(x=>'• '+x.s).join('\n') : '• '+clean;
     }
+    function keyTerms(sentence, limit=5) {
+      const freq={}; normaliseWords(sentence).forEach(w=>freq[w]=(freq[w]||0)+1);
+      return Object.keys(freq).sort((a,b)=>freq[b]-freq[a] || b.length-a.length).slice(0,limit);
+    }
     function makeKnowledgeCheck(text) {
-      const sentences=(text.replace(/\s+/g,' ').trim().match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).filter(s=>s.trim().length>28);
-      const words=normaliseWords(text), freq={}; words.forEach(w=>freq[w]=(freq[w]||0)+1);
-      const keys=Object.keys(freq).sort((a,b)=>freq[b]-freq[a] || b.length-a.length), out=[];
-      for (const sentence of sentences) {
-        const lower=sentence.toLowerCase();
-        const key=keys.find(k=>lower.includes(k.toLowerCase()) && !out.some(q=>q.answer.toLowerCase()===k.toLowerCase()));
-        if (!key) continue;
-        const pos=lower.indexOf(key.toLowerCase());
-        const question=sentence.slice(0,pos)+'________'+sentence.slice(pos+key.length);
-        out.push({question:question.trim(),answer:key});
-        if(out.length===3) break;
-      }
-      return out;
+      const clean=text.replace(/\s+/g,' ').trim();
+      const sentences=(clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).map(s=>s.trim()).filter(s=>s.length>35);
+      if(!sentences.length) return [];
+      const scored=sentences.map((sentence,i)=>({sentence,i,terms:keyTerms(sentence),score:keyTerms(sentence).length + (/(because|causes?|helps?|important|process|when|while|so that|therefore|as a result)/i.test(sentence)?3:0)}));
+      const strongest=[...scored].sort((a,b)=>b.score-a.score).slice(0,4);
+      const main=strongest[0]||scored[0];
+      const causal=scored.find(x=>/(because|causes?|helps?|important|when|therefore|as a result)/i.test(x.sentence))||strongest[1]||main;
+      const detail=strongest.find(x=>x!==main&&x!==causal)||scored[Math.min(1,scored.length-1)]||main;
+      const application=scored.find(x=>/(should|can help|avoid|protect|use|action|practical|need)/i.test(x.sentence))||strongest[strongest.length-1]||main;
+      const qs=[
+        {type:'key',question:'🧠 KEY IDEA — In your own words, what is one important idea from this learning?',answer:main.sentence,keywords:main.terms},
+        {type:'explain',question:'🔎 EXPLAIN — Why or how does this happen? Explain one cause, reason or process from the learning.',answer:causal.sentence,keywords:causal.terms},
+        {type:'detail',question:'💡 REMEMBER — Give one important fact or detail you would want to remember later.',answer:detail.sentence,keywords:detail.terms},
+        {type:'apply',question:'🌍 APPLY — How could this idea matter in real life, or what useful action can you take from it?',answer:application.sentence,keywords:application.terms}
+      ];
+      return qs;
     }
     function buildLearningPack() {
       if (learningPackBusy) return;
@@ -551,9 +587,24 @@
       saveActiveLesson(summary,currentQuiz); goToSection('learningPackSection');
     }
     function checkKnowledge(){
-      if(!currentQuiz.length)return; let correct=0;
-      currentQuiz.forEach((q,i)=>{ const input=document.getElementById('quizAnswer'+i), a=input.value.trim().toLowerCase(), target=q.answer.toLowerCase(); const ok=a && (a===target || target.includes(a) || a.includes(target)); input.style.borderColor=ok?'#17b890':'#ff8a72'; input.style.background=ok?'#effcf7':'#fff4f1'; if(ok)correct++; });
-      const r=document.getElementById('quizResult'); r.textContent=correct===currentQuiz.length?'🌟 Brilliant — you’ve got this lesson!':correct>0?'👏 Good start — '+correct+' of '+currentQuiz.length+' key ideas found. Revisit the summary and try again.':'💡 Have another look at your summary, then try again. That is what revision is for.';
+      if(!currentQuiz.length)return;
+      let strong=0;
+      const feedback=[];
+      currentQuiz.forEach((q,i)=>{
+        const input=document.getElementById('quizAnswer'+i);
+        const a=input.value.trim().toLowerCase();
+        const keys=(q.keywords||keyTerms(q.answer||'',5)).filter(k=>k.length>3);
+        const hits=keys.filter(k=>a.includes(k.toLowerCase())).length;
+        const ok=a.length>=18 && (hits>=1 || a.split(/\s+/).length>=8);
+        input.style.borderColor=ok?'#17b890':'#ff8a72';
+        input.style.background=ok?'#effcf7':'#fff4f1';
+        if(ok) strong++;
+        else feedback.push('Question '+(i+1)+': Review this idea — '+q.answer);
+      });
+      const r=document.getElementById('quizResult');
+      if(strong===currentQuiz.length) r.textContent='🌟 Excellent — you explained, remembered and applied the key learning.';
+      else if(strong>=Math.ceil(currentQuiz.length/2)) r.textContent='👏 Good understanding — '+strong+' of '+currentQuiz.length+' responses are strong. '+feedback.join(' ');
+      else r.textContent='💡 Keep learning — use the summary, then strengthen your answers. '+feedback.join(' ');
     }
 
     /* SAVE LESSON */
