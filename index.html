@@ -86,14 +86,20 @@
       display: block;
     }
 
-    /* BENTO / METRO HOME ACTIONS */
-    .bento-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .bento-tile { min-height:96px; border:1px solid var(--border); border-radius:18px; background:linear-gradient(145deg,#ffffff,#eef9ff); color:var(--text); padding:14px; display:flex; flex-direction:column; justify-content:space-between; text-align:left; cursor:pointer; }
-    .bento-tile strong { font-size:1rem; }
-    .bento-tile small { color:var(--text-muted); line-height:1.25; }
-    .bento-icon { font-size:1.45rem; }
+    /* BENTO / METRO HOME ACTIONS — DISTINCTIVE LEARNING LANES */
+    .bento-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .bento-tile { min-height:118px; border:0; border-radius:22px; color:#fff; padding:16px; display:flex; flex-direction:column; justify-content:space-between; text-align:left; cursor:pointer; box-shadow:0 10px 22px rgba(23,50,77,.16); position:relative; overflow:hidden; transition:transform .18s ease,box-shadow .18s ease; }
+    .bento-tile::after { content:""; position:absolute; width:90px; height:90px; border-radius:50%; right:-24px; bottom:-34px; background:rgba(255,255,255,.16); }
+    .bento-tile:nth-child(1){background:linear-gradient(145deg,#0b78e3,#1aa7ff);}
+    .bento-tile:nth-child(2){background:linear-gradient(145deg,#f4b400,#ffcf3f);color:#17324d;}
+    .bento-tile:nth-child(3){background:linear-gradient(145deg,#ef476f,#ff6b57);}
+    .bento-tile:nth-child(4){background:linear-gradient(145deg,#7147d9,#9b63f4);}
+    .bento-tile:active { transform:scale(.985); }
+    .bento-tile strong { font-size:1.08rem; line-height:1.08; position:relative; z-index:1; }
+    .bento-tile small { color:inherit; opacity:.92; line-height:1.3; position:relative; z-index:1; }
+    .bento-icon { font-size:1.65rem; position:relative; z-index:1; }
     .status-strip { display:flex; gap:6px; flex-wrap:wrap; font-size:.72rem; }
-    .status-pill { border:1px solid var(--border); background:var(--card-alt); border-radius:999px; padding:5px 8px; color:var(--text-muted); }
+    .status-pill { border:1px solid #c6e2f3; background:#f4fbff; border-radius:999px; padding:6px 10px; color:#47657e; font-weight:700; box-shadow:0 3px 8px rgba(36,93,138,.06); }
     .status-pill.ok { color:var(--accent); }
     .section-anchor { scroll-margin-top:12px; }
     button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label:focus-within { outline:3px solid var(--accent); outline-offset:2px; }
@@ -101,7 +107,13 @@
     @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important; animation:none !important; transition:none !important; } }
 
     /* CARDS & INPUTS */
-    .card { background: var(--card-bg); border-radius: 18px; box-shadow:0 8px 24px rgba(36,93,138,.08); border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card { background:var(--card-bg); border-radius:22px; box-shadow:0 12px 28px rgba(36,93,138,.11); border:2px solid var(--border); padding:18px; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+    #captureSection { background:linear-gradient(160deg,#f7fcff 0%,#e8f6ff 100%); border-color:#8fd2ff; box-shadow:0 12px 28px rgba(11,120,227,.12); }
+    #captureSection h2 { color:#075fae; }
+    #learningPackSection { background:linear-gradient(160deg,#fffdf5 0%,#fff3c9 100%); border-color:#ffd25f; box-shadow:0 12px 28px rgba(244,180,0,.12); }
+    #learningPackSection h2 { color:#8b6200; }
+    #librarySection { background:linear-gradient(160deg,#fcfaff 0%,#f0e9ff 100%); border-color:#c7adff; box-shadow:0 12px 28px rgba(113,71,217,.12); }
+    #librarySection h2 { color:#5b35b5; }
     .card h2 { font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
 
     input, select, textarea {
@@ -129,10 +141,10 @@
       align-items: center;
       gap: 6px;
     }
-    .btn-photo { background: #475569; color: white; }
-    .btn-audio { background: #b91c1c; color: white; }
+    .btn-photo { background:linear-gradient(135deg,#315d91,#24486f); color:white; border-radius:12px; }
+    .btn-audio { background:linear-gradient(135deg,#e53935,#b91c1c); color:white; border-radius:12px; }
     .btn-audio.recording { background: #ef4444; animation: pulse 1.2s infinite; }
-    .btn-save { background: var(--accent); color: white; width: 100%; padding: 12px; font-size: 0.95rem; }
+    .btn-save { background:linear-gradient(135deg,#0fbf8f,#079d72); color:white; width:100%; padding:14px; font-size:1rem; border-radius:12px; box-shadow:0 8px 18px rgba(15,191,143,.22); }
     .btn-save:hover { background: var(--accent-hover); }
 
     /* LESSON CARDS */
