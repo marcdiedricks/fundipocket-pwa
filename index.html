@@ -799,7 +799,9 @@
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
         const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim().slice(0, 160);
         const faculty = 'Learning';
-        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim().slice(0, 20000);
+        const paras = doc.querySelectorAll('.card p');
+        const summary = (paras[0] ? paras[0].textContent : '').trim().slice(0, 12000);
+        const notes = (paras[1] ? paras[1].textContent : '').trim().slice(0, 20000);
         
         const tx = db.transaction('lessons', 'readwrite');
         tx.objectStore('lessons').add({
