@@ -8,13 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Extract inline JavaScript
-        run: python3 - <<'PY'
-          from pathlib import Path
-          s=Path('index.html').read_text()
-          js=s.rsplit('<script>',1)[1].split('</script>',1)[0]
-          Path('/tmp/fundi.js').write_text(js)
-          print('JS bytes',len(js))
-          PY
+        run: python3 -c "from pathlib import Path; s=Path('index.html').read_text(); js=s.rsplit('<script>',1)[1].split('</script>',1)[0]; Path('/tmp/fundi.js').write_text(js); print('JS bytes',len(js))"
       - name: JavaScript syntax check
         run: node --check /tmp/fundi.js
       - name: Verify required handlers
