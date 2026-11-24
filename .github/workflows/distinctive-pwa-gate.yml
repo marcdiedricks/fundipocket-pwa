@@ -32,7 +32,7 @@ jobs:
               start=s.index('const '+block+'=')
               end=s.index('\n};',start)+3
               body=s[start:end]
-              missing=[lang for lang in required if not re.search(r'(?m)^'+re.escape(lang)+r':\\{',body)]
+              missing=[lang for lang in required if not re.search(r'(?m)^'+re.escape(lang)+r':\{',body)]
               assert not missing, f'{block} missing languages: {missing}'
           forbidden=[
             "alert('FundiPocket could not open local storage",
