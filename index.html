@@ -684,9 +684,14 @@
           const store = tx.objectStore('lessons');
           data.items.slice(0, 2000).forEach(item => store.add({
             title: String(item.title || 'Restored Learning').slice(0,160),
-            faculty: String(item.faculty || 'General Studies').slice(0,120),
-            stage: String(item.stage || 'General / Lifelong Learning').slice(0,120),
+            faculty: 'Learning',
+            stage: '',
             notes: String(item.notes || '').slice(0,20000),
+            summary: String(item.summary || '').slice(0,12000),
+            quiz: Array.isArray(item.quiz) ? item.quiz.slice(0,3).map(q => ({
+              question: String(q && q.question || '').slice(0,500),
+              answer: String(q && q.answer || '').slice(0,160)
+            })).filter(q => q.question && q.answer) : [],
             photos: [], audio: null,
             date: String(item.date || new Date().toLocaleDateString('en-ZA')).slice(0,80)
           }));
