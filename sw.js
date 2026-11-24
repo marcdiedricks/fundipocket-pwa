@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fundipocket-v8-restored-clean-20261124';
+const CACHE_NAME = 'fundipocket-simple-language-fix-20261124';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
