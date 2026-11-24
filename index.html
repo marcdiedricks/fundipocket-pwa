@@ -233,10 +233,15 @@
     <!-- CAPTURE FORM -->
     <section class="card section-anchor" id="captureSection">
       <h2>📥 Capture your learning</h2>
-      <p style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">While you have access to the lesson, lecture, textbook or notes, put the useful learning here. FundiPocket keeps it on this phone for later.</p>
+      <p style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">Capture useful learning while you have access to it, then keep it on this phone for later. Use FundiPocket for school, further study, training, work or everyday learning.</p>
       
-      <input type="text" id="lessonTitle" maxlength="160" placeholder="Lesson / lecture / textbook section / topic">
-      <textarea id="lessonNotes" placeholder="Type or paste the lesson text or notes here. The more useful text you capture, the better your offline summary and knowledge check."></textarea>
+      <input type="text" id="lessonTitle" maxlength="160" placeholder="Give this learning a short title">
+      <textarea id="lessonNotes" placeholder="Type, paste or add the learning you want to keep. This can be from school, college, university, training, work or everyday life."></textarea>
+      <div class="btn-grid">
+        <button class="btn" style="background:#7147d9;color:white;" onclick="pasteLearningText()">📋 Paste from Clipboard</button>
+        <button class="btn" style="background:#0b78e3;color:white;" onclick="focusLearningText()">⌨️ Type My Notes</button>
+      </div>
+      <div id="pasteHelp" style="font-size:.74rem;color:var(--text-muted);line-height:1.4;">You can also press and hold inside the notes box and choose <strong>Paste</strong>.</div>
 
       <div class="btn-grid">
         <label class="btn btn-photo">
@@ -270,8 +275,9 @@
       <input type="text" id="searchInput" placeholder="🔍 Search your saved learning..." oninput="filterLessons()">
       <div class="btn-grid">
         <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
-        <label class="btn" style="background:#475569;color:white;">♻️ Restore Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
+        <label class="btn" style="background:#475569;color:white;">♻️ Restore Saved Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
       </div>
+      <div style="font-size:.72rem;color:var(--text-muted);line-height:1.4;">Restore opens your device Files. Choose <strong>FundiPocket_Library_Backup.json</strong> from Downloads or wherever you saved it.</div>
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
         <!-- Dynamic Cards -->
       </div>
@@ -436,6 +442,25 @@
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    }
+
+    async function pasteLearningText() {
+      const box = document.getElementById('lessonNotes');
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.readText) throw new Error('clipboard unavailable');
+        const text = await navigator.clipboard.readText();
+        if (!text) { alert('Your clipboard is empty. Copy some text first, then return to FundiPocket.'); return; }
+        box.value = box.value ? box.value + '\n\n' + text : text;
+        box.focus();
+      } catch (e) {
+        box.focus();
+        alert('Press and hold inside the notes box, then choose Paste. Your browser controls clipboard permission.');
+      }
+    }
+    function focusLearningText() {
+      const box = document.getElementById('lessonNotes');
+      box.focus();
+      box.scrollIntoView({behavior:'smooth',block:'center'});
     }
 
     /* AUDIO CAPTURE */
