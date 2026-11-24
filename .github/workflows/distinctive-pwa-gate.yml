@@ -21,6 +21,37 @@ jobs:
           grep -q "function handlePhotoCapture" index.html
           ! grep -qi "Agriculture" index.html
           ! grep -qi "Artisan" index.html
+      - name: Verify five-language runtime coverage
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text()
+          required=['en','af','xh','zu','nso']
+          for block in ['uiTranslations','systemTranslations','runtimeMessages']:
+              start=s.index('const '+block+'=')
+              end=s.index('\n};',start)+3
+              body=s[start:end]
+              missing=[lang for lang in required if not re.search(r'(?m)^'+re.escape(lang)+r':\\{',body)]
+              assert not missing, f'{block} missing languages: {missing}'
+          forbidden=[
+            "alert('FundiPocket could not open local storage",
+            "alert('You can attach up to 5 photos",
+            "alert('Audio recording is not supported",
+            "input.placeholder='Your answer'",
+            "Excellent — you explained, remembered and applied",
+            "Good understanding — ",
+            "Keep learning — use the summary",
+            "alert('Library backup restored",
+            "alert('Restore failed",
+            "alert('This shared learning could not be imported"
+          ]
+          found=[x for x in forbidden if x in s]
+          assert not found, 'Hard-coded English learner strings remain: '+repr(found)
+          sw=Path('sw.js').read_text()
+          assert 'fundipocket-distinctive-v7' not in sw, 'stale V7 cache identity remains'
+          print('PASS: five-language runtime coverage and cache identity')
+          PY
       - name: Verify PWA shell files
         run: |
           test -s manifest.json
