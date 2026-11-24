@@ -188,8 +188,18 @@
     <section class="card">
       <h2>✍️ Capture Learning</h2>
       
-      <select id="facultySelect">
-        <option value="General Studies">General / Any Learning</option>
+      <select id="stageSelect" aria-label="Learning stage">
+        <option value="General / Lifelong Learning">Learning Stage: General / Lifelong Learning</option>
+        <option value="Primary School">Primary School</option>
+        <option value="Secondary / High School">Secondary / High School</option>
+        <option value="TVET / Artisan">TVET / Artisan</option>
+        <option value="College">College</option>
+        <option value="University">University</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <select id="facultySelect" aria-label="Learning area">
+        <option value="General Studies">Learning Area: General / Any Subject</option>
         <option value="Engineering / Technology / Built Environment">Engineering / Technology / Built Environment</option>
         <option value="Law / Legal Studies">Law / Legal Studies</option>
         <option value="Business / Commerce / Management">Business / Commerce / Management</option>
@@ -373,9 +383,10 @@
       }
       const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Lecture';
       const faculty = document.getElementById('facultySelect').value;
+      const stage = document.getElementById('stageSelect').value;
       const notes = document.getElementById('lessonNotes').value.trim();
       const record = {
-        title, faculty, notes,
+        title, faculty, stage, notes,
         photos: queuedPhotos,
         audio: recordedAudioBlob,
         date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -422,7 +433,7 @@
         div.className = 'lesson-card';
         div.innerHTML = `
           <div class="lesson-meta">
-            <span class="faculty-tag">${l.faculty}</span>
+            <span class="faculty-tag">${l.stage ? l.stage + ' • ' : ''}${l.faculty}</span>
             <span style="color:var(--text-muted); font-size:0.75rem;">${l.date}</span>
           </div>
           <div class="lesson-title">${l.title}</div>
@@ -443,6 +454,7 @@
       const filtered = allLessonsCache.filter(l => 
         l.title.toLowerCase().includes(q) ||
         l.faculty.toLowerCase().includes(q) ||
+        (l.stage && l.stage.toLowerCase().includes(q)) ||
         (l.notes && l.notes.toLowerCase().includes(q))
       );
       renderLessons(filtered);
@@ -452,7 +464,7 @@
     function openStudyModal(id) {
       const lesson = allLessonsCache.find(l => l.id === Number(id));
       if (!lesson) return;
-      document.getElementById('modalFaculty').textContent = lesson.faculty;
+      document.getElementById('modalFaculty').textContent = (lesson.stage ? lesson.stage + ' • ' : '') + lesson.faculty;
       document.getElementById('modalTitle').textContent = lesson.title;
       document.getElementById('modalDate').textContent = 'Captured: ' + lesson.date;
       document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes saved.';
