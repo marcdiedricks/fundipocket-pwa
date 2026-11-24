@@ -440,7 +440,7 @@
         alert('Local storage is not ready yet. Please wait a moment and try again.');
         return;
       }
-      const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Lecture';
+      const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Learning';
       const faculty = document.getElementById('facultySelect').value;
       const stage = document.getElementById('stageSelect').value;
       const notes = document.getElementById('lessonNotes').value.trim();
@@ -620,7 +620,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
-        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Lesson').trim();
+        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim();
         const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim();
         const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim();
         
@@ -634,7 +634,7 @@
           date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
         });
         tx.oncomplete = () => {
-          alert(`Successfully imported: ${title}`);
+          alert(`Imported successfully: ${title}`);
           refreshTelemetry();
           loadLessons();
         };
