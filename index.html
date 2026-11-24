@@ -362,8 +362,6 @@
       if (!btn) return;
       const s=systemTranslations[currentLanguage]||systemTranslations.en; btn.textContent = theme === 'dark' ? '☀️ '+s.light : '🌙 '+s.dark;
     }
-    initTheme();
-
     /* INDEXEDDB STORAGE */
     let db;
     let queuedPhotos = [];
