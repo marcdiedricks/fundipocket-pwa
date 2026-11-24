@@ -269,6 +269,10 @@
     <section class="card section-anchor" id="librarySection">
       <h2>📚 My Learning</h2>
       <input type="text" id="searchInput" placeholder="🔍 Search subject, topic, formula, or notes..." oninput="filterLessons()">
+      <div class="btn-grid">
+        <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
+        <label class="btn" style="background:#475569;color:white;">♻️ Restore Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
+      </div>
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
         <!-- Dynamic Cards -->
       </div>
@@ -608,6 +612,46 @@
     }
     function closeStudyModal() {
       document.getElementById('studyModal').classList.remove('open');
+    }
+
+    /* PORTABLE LIBRARY BACKUP — text metadata only; media remains in per-item shared bundles */
+    function exportLibraryBackup() {
+      const safe = allLessonsCache.map(({id, audio, photos, ...item}) => ({ ...item, mediaNote: (audio || (photos && photos.length)) ? 'Media not included in lightweight library backup' : '' }));
+      const payload = { format: 'FundiPocketLibraryBackup', version: 1, exportedAt: new Date().toISOString(), items: safe };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'FundiPocket_Library_Backup.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function restoreLibraryBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Backup is too large for the lightweight restore tool.'); event.target.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || data.format !== 'FundiPocketLibraryBackup' || !Array.isArray(data.items)) throw new Error('Invalid backup');
+          if (!db) throw new Error('Storage not ready');
+          const tx = db.transaction('lessons', 'readwrite');
+          const store = tx.objectStore('lessons');
+          data.items.slice(0, 2000).forEach(item => store.add({
+            title: String(item.title || 'Restored Learning').slice(0,160),
+            faculty: String(item.faculty || 'General Studies').slice(0,120),
+            stage: String(item.stage || 'General / Lifelong Learning').slice(0,120),
+            notes: String(item.notes || '').slice(0,20000),
+            photos: [], audio: null,
+            date: String(item.date || new Date().toLocaleDateString('en-ZA')).slice(0,80)
+          }));
+          tx.oncomplete = () => { event.target.value=''; loadLessons(); refreshTelemetry(); alert('Library backup restored. Text learning has been added to this device.'); };
+          tx.onerror = () => alert('Restore failed. Check available storage and try again.');
+        } catch (e) { event.target.value=''; alert('This is not a valid FundiPocket library backup.'); }
+      };
+      reader.onerror = () => { event.target.value=''; alert('Backup file could not be read.'); };
+      reader.readAsText(file);
     }
 
     /* DELETE */
