@@ -329,16 +329,16 @@
       const pill = document.getElementById('offlineReadyPill');
       if (!pill) return;
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE SHELL: READY'; }).catch(() => { pill.textContent = 'OFFLINE SHELL: CHECK'; });
+        navigator.serviceWorker.ready.then(() => { pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineReady; }).catch(() => { pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineCheck; });
       } else {
-        pill.textContent = 'OFFLINE SHELL: LIMITED';
+        pill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).offlineLimited;
       }
       updateNetworkPill();
     });
     function updateNetworkPill() {
       const p = document.getElementById('networkPill');
       if (!p) return;
-      p.textContent = navigator.onLine ? 'NETWORK: AVAILABLE' : 'NETWORK: OFFLINE';
+      const s=systemTranslations[currentLanguage]||systemTranslations.en; p.textContent = navigator.onLine ? s.networkAvailable : s.networkOffline;
       p.classList.toggle('ok', !navigator.onLine);
     }
     window.addEventListener('online', updateNetworkPill);
@@ -360,7 +360,7 @@
     function updateThemeButtonLabel(theme) {
       const btn = document.getElementById('themeToggleBtn');
       if (!btn) return;
-      btn.innerHTML = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+      const s=systemTranslations[currentLanguage]||systemTranslations.en; btn.textContent = theme === 'dark' ? '☀️ '+s.light : '🌙 '+s.dark;
     }
     initTheme();
 
@@ -383,7 +383,7 @@
     dbReq.onsuccess = (e) => {
       db = e.target.result;
       const storagePill = document.getElementById('localStoragePill');
-      if (storagePill) storagePill.textContent = 'LOCAL STORAGE: READY';
+      if (storagePill) storagePill.textContent = (systemTranslations[currentLanguage]||systemTranslations.en).storageReady;
       refreshTelemetry();
       loadLessons();
     };
@@ -529,12 +529,21 @@ xh:{tag:'Umncedisi wokufunda osebenza ngaphandle kwe-intanethi • Wenzelwe iind
 zu:{tag:'Umsizi wokufunda osebenza ngaphandle kwe-inthanethi • Wakhelwe izindawo ezinedatha encane',capture:'📥 Gcina okufundayo',pack:'✨ Iphakethe Lami Lokufunda',library:'📚 Ukufunda Kwami',offline:'📴 Ngaphandle kwe-inthanethi',online:'🌐 Ku-inthanethi',offlineHelp:'Ukufunda ngaphandle kwe-inthanethi: izifinyezo, ukuhlolwa kolwazi nokufunda okulondoloziwe kuhlala kule divayisi.',onlineHelp:'Usizo lwe-inthanethi: ukuxhumeka kuyatholakala, kodwa ukufunda okulondoloziwe kusahlala kule divayisi.',tiles:['GCINA','ISIFINYEZO','HLOLA ULWAZI LWAMI','IPHOKHETHI LAMI'],tileHelp:['Faka isifundo, inkulumo, ikhasi noma amanothi ephaketheni lakho','Guqula umbhalo owugciniwe ube isifinyezo esicacile sokubuyekeza','Ukuhlola okufushane nokunobungane kwalokho okugcine','Vula ukufunda okulondoloziwe, ngisho ungaxhunyiwe'],captureIntro:'Gcina ukufunda okuwusizo ngesikhathi usakwazi ukukufinyelela, bese ukugcina kule foni ukuze ukufunde kamuva. Sebenzisa iFundiPocket esikoleni, ezifundweni eziqhubekayo, ekuqeqesheni, emsebenzini noma ekufundeni kwansuku zonke.',titlePh:'Nikeza lokhu kufunda isihloko esifushane',notesPh:'Thayipha, namathisela noma engeza ukufunda ofuna ukukugcina.',paste:'📋 Namathisela ebhodini lokukopisha',type:'⌨️ Thayipha amanothi ami',pasteHelp:'Ungacindezela ubambe ngaphakathi kwebhokisi lamanothi bese ukhetha Namathisela.',photo:'📷 Thwebula ibhodi / ikhasi',audio:'🎙️ Rekhoda umsindo wokufunda',photos:'Izithombe ezilindile:',audioLabel:'Umsindo:',none:'Akukho',make:'✨ Yenza iphakethe lami lokufunda',packEmpty:'Gcina umbhalo wesifundo ngenhla bese uthepha Yenza iphakethe lami lokufunda. Isifinyezo nokuhlolwa kolwazi kuzovela lapha.',yourSummary:'🌟 Isifinyezo sakho',check:'🎯 Hlola ulwazi lwami',checkHelp:'Ukuhlola okusheshayo — akusona isivivinyo. Sebenzisa isifinyezo uma udinga usizo.',answers:'🎉 Hlola izimpendulo zami',search:'🔍 Sesha ukufunda kwakho okulondoloziwe...',backup:'🧰 Yenza ikhophi yomtapo',restore:'♻️ Buyisela ikhophi egciniwe',restoreHelp:'Ukubuyisela kuvula Amafayela edivayisi yakho. Khetha FundiPocket_Library_Backup.json kokulandiwe noma lapho uyigcine khona.',empty:'Akukho kufunda okulondoloziwe okutholakele lapha.',saved:'Kulondolozwe ngaphandle kwe-inthanethi',study:'📖 Funda',share:'📲 Yabelana',save:'⬇️ Gcina',close:'✕ Vala',photosHeading:'Izithombe zebhodi / ikhasi / amanothi',summaryHeading:'✨ Isifinyezo',captured:'Ukufunda okugciniwe',qKey:'🧠 UMBONO OYINHLOKO — Ngamazwi akho, yimuphi umqondo owodwa obalulekile kulokhu kufunda?',qExplain:'🔎 CHAZA — Kungani noma kwenzeka kanjani lokhu? Chaza imbangela, isizathu noma inqubo eyodwa.',qDetail:'💡 KHUMBULA — Nikeza iqiniso noma imininingwane ebalulekile ofuna ukuyikhumbula kamuva.',qApply:'🌍 SEBENZISA — Lo mbono ungabaluleka kanjani empilweni yangempela, noma yisiphi isenzo esiwusizo ongasithatha?'},
 nso:{tag:'Mothuši wa go ithuta wa pele ka ntle ga inthanete • O diretšwe mafelo a data ya fase',capture:'📥 Boloka tše o ithutago tšona',pack:'✨ Sephuthelwana sa ka sa go Ithuta',library:'📚 Tše ke Ithutago Tšona',offline:'📴 Ka ntle ga inthanete',online:'🌐 Inthaneteng',offlineHelp:'Go ithuta ka ntle ga inthanete: dikakaretšo, diteko tša tsebo le tše di bolokilwego di dula mo sedirišweng se.',onlineHelp:'Thušo ya inthanete: kgokagano e gona, eupša tše o di bolokilego di sa dula mo sedirišweng se.',tiles:['BOLOKA','KAKARETŠO','LEKA TSEBO YA KA','TŠE KE ITHUTAGO TŠONA'],tileHelp:['Tsenya thuto, polelo, letlakala goba dintlha ka pokothong ya gago','Fetoša sengwalwa se se bolokilwego gore e be kakaretšo ye e kwagalago','Teko ye kopana ya bogwera go tšwa go tše o di bolokilego','Bula tše o di bolokilego, le ge o se na inthanete'],captureIntro:'Boloka thuto ye e nago le mohola ge o sa kgona go e hwetša, gomme o e boloke mo mogaleng wo gore o ithute ka yona ka morago. Diriša FundiPocket sekolong, dithutong tše dingwe, tlhahlong, mošomong goba go ithuteng ga letšatši le letšatši.',titlePh:'Fa thuto ye sehlogo se sekopana',notesPh:'Ngwala, kgomaretša goba oketša tše o ithutago tšona tše o nyakago go di boloka.',paste:'📋 Kgomaretša go tšwa clipboard',type:'⌨️ Ngwala dintlha tša ka',pasteHelp:'O ka gatelela wa swara ka gare ga lepokisi la dintlha gomme wa kgetha Kgomaretša.',photo:'📷 Tšea seswantšho sa boto / letlakala',audio:'🎙️ Rekhota modumo wa thuto',photos:'Diswantšho tše di letetšego:',audioLabel:'Modumo:',none:'Ga go na',make:'✨ Dira sephuthelwana sa ka sa go ithuta',packEmpty:'Boloka sengwalwa sa thuto ka godimo, gomme o kgotle Dira sephuthelwana sa ka sa go ithuta. Kakaretšo le teko ya tsebo di tla tšwelela mo.',yourSummary:'🌟 Kakaretšo ya gago',check:'🎯 Leka tsebo ya ka',checkHelp:'Teko ye kopana — ga se tlhahlobo. Diriša kakaretšo ge o nyaka thušo.',answers:'🎉 Lekola dikarabo tša ka',search:'🔍 Nyaka tše o di bolokilego...',backup:'🧰 Boloka khophi ya bokgobapuku',restore:'♻️ Bušetša khophi ye e bolokilwego',restoreHelp:'Go bušetša go bula Difaele tša sedirišwa sa gago. Kgetha FundiPocket_Library_Backup.json go Downloads goba moo o e bolokilego.',empty:'Ga go na thuto ye e bolokilwego ye e hweditšwego mo.',saved:'E bolokilwe ka ntle ga inthanete',study:'📖 Ithute',share:'📲 Abelana',save:'⬇️ Boloka',close:'✕ Tswalela',photosHeading:'Diswantšho tša boto / letlakala / dintlha',summaryHeading:'✨ Kakaretšo',captured:'Thuto ye e bolokilwego',qKey:'🧠 KGopolo YE KGOLO — Ka mantšu a gago, ke kgopolo efe e bohlokwa go tšwa thutong ye?',qExplain:'🔎 HLALOŠA — Ke ka baka la eng goba se direga bjang? Hlaloša lebaka, sebaki goba tshepedišo e tee.',qDetail:'💡 GOPOLA — Fa ntlha e tee e bohlokwa ye o nyakago go e gopola ka morago.',qApply:'🌍 DIRIŠA — Kgopolo ye e ka ba bohlokwa bjang bophelong, goba ke tiro efe ya mohola ye o ka e tšeago?'}
 };
+const systemTranslations={
+en:{language:'LANGUAGE',light:'Light',dark:'Dark',offlineReady:'OFFLINE SHELL: READY',offlineCheck:'OFFLINE SHELL: CHECK',offlineLimited:'OFFLINE SHELL: LIMITED',storageReady:'LOCAL STORAGE: READY',networkAvailable:'NETWORK: AVAILABLE',networkOffline:'NETWORK: OFFLINE',storagePool:'Storage Pool:',safeQuota:'Safe Quota:'},
+af:{language:'TAAL',light:'Lig',dark:'Donker',offlineReady:'VANLYN-DOP: GEREED',offlineCheck:'VANLYN-DOP: KONTROLEER',offlineLimited:'VANLYN-DOP: BEPERK',storageReady:'PLAASLIKE BERGING: GEREED',networkAvailable:'NETWERK: BESKIKBAAR',networkOffline:'NETWERK: VANLYN',storagePool:'Berging gebruik:',safeQuota:'Veilige kwota:'},
+xh:{language:'ULWIMI',light:'Khanya',dark:'Mnyama',offlineReady:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KULUNGILE',offlineCheck:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KUYAHLOLWA',offlineLimited:'UKUSEBENZA NGAPHANDLE KWE-INTANETHI: KUNOMDA',storageReady:'UGCINO LWESIXHOBO: LULUNGILE',networkAvailable:'INETHIWEKHI: IYAFUMANEKA',networkOffline:'INETHIWEKHI: AYIKHO',storagePool:'Ugcino olusetyenzisiweyo:',safeQuota:'Umda okhuselekileyo:'},
+zu:{language:'ULIMI',light:'Khanya',dark:'Mnyama',offlineReady:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KULUNGILE',offlineCheck:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KUYAHLOLWA',offlineLimited:'UKUSEBENZA NGAPHANDLE KWE-INTHANETHI: KUNOMKHAWULO',storageReady:'UKUGCINA KWEDIVAYISI: KULUNGILE',networkAvailable:'INETHIWEKHI: IYATHOLAKALA',networkOffline:'INETHIWEKHI: AYIKHO',storagePool:'Isitoreji esisetshenzisiwe:',safeQuota:'Umkhawulo ophephile:'},
+nso:{language:'LELEME',light:'Seetša',dark:'Leswiswi',offlineReady:'KA NTLE GA INTHANETE: GO LOKILE',offlineCheck:'KA NTLE GA INTHANETE: GO A LEKOLWA',offlineLimited:'KA NTLE GA INTHANETE: GO NA LE MOEDI',storageReady:'POLOKELO YA SEDIRIŠWA: GO LOKILE',networkAvailable:'NETEWEKE: E GONA',networkOffline:'NETEWEKE: GA E GONA',storagePool:'Polokelo ye e dirišitšwego:',safeQuota:'Moedi wa polokego:'}
+};
 let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
 let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
 function setTxt(sel,txt){const e=document.querySelector(sel);if(e)e.textContent=txt;}
 function applyLanguageToInterface(){
- const d=uiTranslations[currentLanguage]||uiTranslations.en;
+ const d=uiTranslations[currentLanguage]||uiTranslations.en; const s=systemTranslations[currentLanguage]||systemTranslations.en;
  document.documentElement.lang=currentLanguage;
+ const languageLabel=document.querySelector('section[aria-label="Language and learning mode"] > div:first-child'); if(languageLabel) languageLabel.textContent=s.language;
+ const tele=document.querySelector('.telemetry-card'); if(tele){const ds=tele.querySelectorAll(':scope > div'); if(ds[0])ds[0].childNodes[0].nodeValue=s.storagePool+' '; if(ds[1])ds[1].childNodes[0].nodeValue=s.safeQuota+' ';}
  setTxt('#brandTagline',d.tag); setTxt('#captureHeading',d.capture); setTxt('#packHeading',d.pack); setTxt('#libraryHeading',d.library);
  document.querySelectorAll('.bento-tile').forEach((e,i)=>{const s=e.querySelector('strong'),m=e.querySelector('small');if(s)s.textContent=d.tiles[i];if(m)m.textContent=d.tileHelp[i];});
  const cap=document.querySelector('#captureSection > p'); if(cap)cap.textContent=d.captureIntro;
