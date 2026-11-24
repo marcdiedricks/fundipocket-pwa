@@ -508,6 +508,8 @@
 
     /* OFFLINE LEARNING PACK — captured text only; no network call */
     let currentQuiz = [];
+    let learningPackBusy = false;
+    let studyObjectUrls = [];
     function normaliseWords(text) {
       const stop = ['that','this','with','from','have','were','been','they','their','there','what','when','where','which','would','could','should','about','into','your','then','than','also','only','some','more','most','very','because','lesson','notes'];
       return (text.toLowerCase().match(/[a-zà-ž][a-zà-ž'-]{3,}/gi) || []).filter(w => !stop.includes(w));
@@ -536,8 +538,10 @@
       return out;
     }
     function buildLearningPack() {
+      if (learningPackBusy) return;
       const text=document.getElementById('lessonNotes').value.trim();
       if(text.length<80){ alert('Add a little more of the lesson text or notes first so FundiPocket has enough material to make a useful learning pack.'); return; }
+      learningPackBusy = true;
       const summary=makeOfflineSummary(text); currentQuiz=makeKnowledgeCheck(text);
       document.getElementById('generatedSummary').textContent=summary;
       const area=document.getElementById('quizArea'); area.innerHTML='';
@@ -660,6 +664,7 @@
         audio.controls = true;
         audio.style.width = '100%';
         audio.src = URL.createObjectURL(lesson.audio);
+        studyObjectUrls.push(audio.src);
         audioSec.appendChild(audio);
       }
 
@@ -672,6 +677,7 @@
           img.style.borderRadius = '6px';
           img.style.border = '1px solid var(--border)';
           img.src = URL.createObjectURL(p);
+          studyObjectUrls.push(img.src);
           imgSec.appendChild(img);
         });
       } else {
