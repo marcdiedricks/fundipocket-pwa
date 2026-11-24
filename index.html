@@ -340,6 +340,14 @@
       alert('FundiPocket could not open local storage. Your device may be low on storage or private browsing may be blocking offline saving.');
     };
 
+    /* ASK SUPPORTED BROWSERS TO REDUCE AUTOMATIC EVICTION OF OFFLINE LEARNING */
+    async function requestPersistentStorage() {
+      try {
+        if (navigator.storage && navigator.storage.persist) await navigator.storage.persist();
+      } catch (e) {}
+    }
+    requestPersistentStorage();
+
     /* STORAGE ESTIMATION */
     async function refreshTelemetry() {
       if (navigator.storage && navigator.storage.estimate) {
@@ -377,8 +385,13 @@
           }
           ctx.putImageData(imgData, 0, 0);
           canvas.toBlob((blob) => {
+            if (!blob) {
+              alert('This photo could not be prepared. Please try another photo.');
+              return;
+            }
             queuedPhotos.push(blob);
             document.getElementById('photoCountBadge').textContent = queuedPhotos.length;
+            event.target.value = '';
           }, 'image/webp', 0.65);
         };
         img.src = e.target.result;
@@ -396,9 +409,17 @@
         return;
       }
       try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+          alert('Audio recording is not supported on this device/browser. You can still save notes and photos offline.');
+          return;
+        }
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+        try {
+          mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+        } catch (e) {
+          mediaRecorder = new MediaRecorder(stream);
+        }
         mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
           recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
