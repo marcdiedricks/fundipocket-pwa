@@ -641,7 +641,7 @@
     function filterLessons() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allLessonsCache.filter(l => 
-        l.title.toLowerCase().includes(q) ||
+        String(l.title || '').toLowerCase().includes(q) ||
         (l.notes && l.notes.toLowerCase().includes(q))
       );
       renderLessons(filtered);
