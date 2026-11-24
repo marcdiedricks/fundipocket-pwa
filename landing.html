@@ -393,7 +393,7 @@
     <!-- Student Pilot Intake Form -->
     <div class="form-card">
       <h3 id="t_form_title">Request Pilot Access</h3>
-      <p class="form-sub" id="t_form_sub">Join the early testing cohort. Enter your details below for offline setup access.</p>
+      <p class="form-sub" id="t_form_sub">Pilot contact form for adult learners, parents/guardians, educators and coordinators. Learners under 18 should use FundiPocket with parent/guardian or school supervision.</p>
       
       <form id="intake-form">
         <div class="form-group">
@@ -419,7 +419,7 @@
         <div class="checkbox-group">
           <input type="checkbox" id="popia" required />
           <label for="popia" id="t_popia_text">
-            I consent to the Solutions Desk contacting me regarding FundiPocket pilot tools. Data is handled under POPIA compliance and never shared.
+            I consent to MD Digital using these details only to contact me about the FundiPocket pilot. Online submissions are sent through the form delivery service; an offline copy may remain on this device.
           </label>
         </div>
 
@@ -494,12 +494,12 @@
         t_p4_title: "Direct Solutions Desk",
         t_p4_desc: "Direct access to technical support and resource guidance from systems builder Marc Diedricks.",
         t_form_title: "Request Pilot Access",
-        t_form_sub: "Join the early testing cohort. Enter your details below for offline setup access.",
+        t_form_sub: "Pilot contact form for adult learners, parents/guardians, educators and coordinators. Learners under 18 should use FundiPocket with parent/guardian or school supervision.",
         t_lbl_name: "Full Name",
         t_lbl_phone: "WhatsApp / Mobile Number",
         t_lbl_inst: "School / College / TVET / Institution (optional)",
         t_lbl_trade: "Grade / Subject / Course / Trade (optional)",
-        t_popia_text: "I consent to the Solutions Desk contacting me regarding FundiPocket pilot tools. Data is handled under POPIA compliance and never shared.",
+        t_popia_text: "I consent to MD Digital using these details only to contact me about the FundiPocket pilot. Online submissions are sent through the form delivery service; an offline copy may remain on this device.",
         t_btn_submit: "Submit Pilot Request",
         t_desk_role: "Systems Builder & Digital Creator",
         t_desk_desc: "Engineering lightweight, offline-first, multilingual PWAs and practical digital toolkits for low-bandwidth environments. Designed to bridge access for underserved and marginalized communities across South Africa.",
@@ -657,10 +657,10 @@
           throw new Error('Network dispatch rejected');
         }
       } catch (err) {
-        // Fallback: If offline or dispatch throttled, data remains safe in localStorage
+        // Offline fallback: keep a local copy, but do not claim automatic delivery
         feedback.style.background = '#064e3b';
         feedback.style.color = '#34d399';
-        feedback.innerText = 'Request saved offline! Your access details are queued.';
+        feedback.innerText = 'Not sent yet. A copy is saved on this device only. Reconnect and submit again when you have data or Wi-Fi.';
         intakeForm.reset();
       }
     });
