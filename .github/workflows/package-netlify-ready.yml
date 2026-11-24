@@ -1,0 +1,20 @@
+name: Package FundiPocket Netlify Ready
+on:
+  push:
+    branches:
+      - packaging/netlify-ready-89df5f33
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare exact site files
+        run: |
+          mkdir site
+          cp index.html landing.html manifest.json qr.html sw.js site/
+      - name: Upload Netlify-ready ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: FundiPocket_89df5f33_NETLIFY_READY
+          path: site/*
+          if-no-files-found: error
