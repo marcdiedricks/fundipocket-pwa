@@ -288,6 +288,9 @@
       refreshTelemetry();
       loadLessons();
     };
+    dbReq.onerror = () => {
+      alert('FundiPocket could not open local storage. Your device may be low on storage or private browsing may be blocking offline saving.');
+    };
 
     /* STORAGE ESTIMATION */
     async function refreshTelemetry() {
@@ -364,6 +367,10 @@
 
     /* SAVE LESSON */
     function saveActiveLesson() {
+      if (!db) {
+        alert('Local storage is not ready yet. Please wait a moment and try again.');
+        return;
+      }
       const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Lecture';
       const faculty = document.getElementById('facultySelect').value;
       const notes = document.getElementById('lessonNotes').value.trim();
@@ -375,6 +382,12 @@
       };
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').add(record);
+      tx.onerror = () => {
+        alert('This learning item could not be saved. Please free some device storage and try again.');
+      };
+      tx.onabort = () => {
+        alert('Saving was interrupted. Your current capture has not been cleared; please try again.');
+      };
       tx.oncomplete = () => {
         queuedPhotos = [];
         recordedAudioBlob = null;
