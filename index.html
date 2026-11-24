@@ -250,7 +250,7 @@
       </div>
 
       <div id="captureSummary" style="font-size:0.75rem; color:var(--text-muted);">
-        Photos queued: <span id="photoCountBadge">0</span> | Audio: <span id="audioStatusBadge">None</span>
+        Photos queued: <span id="photoCountBadge">0</span>/5 | Audio: <span id="audioStatusBadge">None</span>
       </div>
 
       <button class="btn btn-save" onclick="saveActiveLesson()">💾 Save Learning Offline</button>
@@ -326,6 +326,7 @@
     let recordedAudioBlob = null;
     let mediaRecorder = null;
     let audioChunks = [];
+    let audioStopTimer = null;
     let allLessonsCache = [];
 
     const dbReq = indexedDB.open("FundiPocketDB", 2);
@@ -367,6 +368,11 @@
     function handlePhotoCapture(event) {
       const file = event.target.files[0];
       if (!file) return;
+      if (queuedPhotos.length >= 5) {
+        alert('You can attach up to 5 photos to one learning item. Save this item, then start another if you need more.');
+        event.target.value = '';
+        return;
+      }
       if (file.size > 8 * 1024 * 1024) {
         alert('This shared file is larger than 8 MB. For low-storage phones, ask the sender for a smaller learning bundle.');
         event.target.value = '';
@@ -431,11 +437,19 @@
         }
         mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
+          if (audioStopTimer) { clearTimeout(audioStopTimer); audioStopTimer = null; }
           recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           document.getElementById('audioStatusBadge').textContent = `${(recordedAudioBlob.size / 1024).toFixed(0)} KB ready`;
           stream.getTracks().forEach(t => t.stop());
         };
         mediaRecorder.start();
+        audioStopTimer = setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            btn.textContent = '🎙️ Record Learning Audio';
+          }
+        }, 10 * 60 * 1000);
         btn.classList.add('recording');
         btn.textContent = '⏹️ Stop Recording';
       } catch (err) {
