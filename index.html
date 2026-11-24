@@ -732,7 +732,7 @@
         });
       }
 
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHTML(lesson.title)}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${escapeHTML(lesson.faculty)}</span><h1>${escapeHTML(lesson.title)}</h1><p style="font-size:0.8rem;color:#94a3b8">${escapeHTML(lesson.date)}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${escapeHTML(lesson.notes)}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHTML(lesson.title)}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">Saved Offline</span><h1>${escapeHTML(lesson.title)}</h1><p style="font-size:0.8rem;color:#94a3b8">${escapeHTML(lesson.date)}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Summary</h3><p style="white-space:pre-wrap;font-size:0.9rem">${escapeHTML(lesson.summary || makeOfflineSummary(lesson.notes || ''))}</p></div><div class="card"><h3>Captured Learning</h3><p style="white-space:pre-wrap;font-size:0.9rem">${escapeHTML(lesson.notes)}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion</footer></body></html>`;
     }
 
     async function downloadLessonBundle(id) {
@@ -744,6 +744,7 @@
       a.href = URL.createObjectURL(blob);
       a.download = `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`;
       a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
 
     async function shareLessonBundle(id) {
@@ -752,7 +753,7 @@
       const html = await buildStandaloneHTML(lesson);
       const file = new File([html], `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`, { type: 'text/html' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: lesson.title, text: 'Here is offline learning shared from FundiPocket.' });
+        try { await navigator.share({ files: [file], title: lesson.title, text: 'Here is offline learning shared from FundiPocket.' }); } catch (e) { if (e && e.name !== 'AbortError') downloadLessonBundle(id); }
       } else {
         downloadLessonBundle(id);
       }
@@ -766,7 +767,7 @@
       reader.onload = (e) => {
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
         const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim().slice(0, 160);
-        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim().slice(0, 120);
+        const faculty = 'Learning';
         const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim().slice(0, 20000);
         
         const tx = db.transaction('lessons', 'readwrite');
