@@ -46,8 +46,11 @@ jobs:
             "alert('Restore failed",
             "alert('This shared learning could not be imported"
           ]
-          found=[x for x in forbidden if x in s]
-          assert not found, 'Hard-coded English learner strings remain: '+repr(found)
+          runtime_start=s.index('const runtimeMessages=')
+          runtime_end=s.index('const systemTranslations=',runtime_start)
+          executable=s[:runtime_start]+s[runtime_end:]
+          found=[x for x in forbidden if x in executable]
+          assert not found, 'Hard-coded English learner strings remain outside translation resources: '+repr(found)
           sw=Path('sw.js').read_text()
           assert 'fundipocket-distinctive-v7' not in sw, 'stale V7 cache identity remains'
           print('PASS: five-language runtime coverage and cache identity')
