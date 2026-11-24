@@ -1,0 +1,28 @@
+name: Diagnose FundiPocket Runtime
+on:
+  push:
+    branches: [packaging/netlify-ready-89df5f33]
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract inline JavaScript
+        run: python3 - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text()
+          js=s.rsplit('<script>',1)[1].split('</script>',1)[0]
+          Path('/tmp/fundi.js').write_text(js)
+          print('JS bytes',len(js))
+          PY
+      - name: JavaScript syntax check
+        run: node --check /tmp/fundi.js
+      - name: Verify required handlers
+        run: |
+          grep -q "function goToSection" index.html
+          grep -q "function handlePhotoCapture" index.html
+          grep -q "function toggleAudioRecording" index.html
+          grep -q "function buildLearningPack" index.html
+          grep -q "function checkKnowledge" index.html
+          grep -q "function exportLibraryBackup" index.html
+          grep -q "function restoreLibraryBackup" index.html
