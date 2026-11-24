@@ -367,6 +367,11 @@
     function handlePhotoCapture(event) {
       const file = event.target.files[0];
       if (!file) return;
+      if (file.size > 8 * 1024 * 1024) {
+        alert('This shared file is larger than 8 MB. For low-storage phones, ask the sender for a smaller learning bundle.');
+        event.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -633,9 +638,9 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
-        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim();
-        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim();
-        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim();
+        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim().slice(0, 160);
+        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim().slice(0, 120);
+        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim().slice(0, 20000);
         
         const tx = db.transaction('lessons', 'readwrite');
         tx.objectStore('lessons').add({
@@ -646,11 +651,17 @@
           audio: null,
           date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
         });
+        tx.onerror = () => alert('This shared learning could not be imported. Check available device storage and try again.');
         tx.oncomplete = () => {
+          event.target.value = '';
           alert(`Imported successfully: ${title}`);
           refreshTelemetry();
           loadLessons();
         };
+      };
+      reader.onerror = () => {
+        event.target.value = '';
+        alert('This shared file could not be read.');
       };
       reader.readAsText(file);
     }
