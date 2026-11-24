@@ -216,37 +216,8 @@
     <section class="card section-anchor" id="captureSection">
       <h2>✍️ Capture Learning</h2>
       
-      <select id="stageSelect" aria-label="Learning stage">
-        <option value="General / Lifelong Learning">Learning Stage: General / Lifelong Learning</option>
-        <option value="Primary School">Primary School</option>
-        <option value="Secondary / High School">Secondary / High School</option>
-        <option value="TVET / Artisan">TVET / Artisan</option>
-        <option value="College">College</option>
-        <option value="University">University</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <select id="facultySelect" aria-label="Learning area" onchange="toggleCustomLearningArea()">
-        <option value="General Studies">Learning Area: General / Any Subject</option>
-        <option value="Languages & Literacy">Languages / Literacy</option>
-        <option value="Mathematics">Mathematics</option>
-        <option value="Natural Sciences">Natural Sciences</option>
-        <option value="Life Skills / Life Orientation">Life Skills / Life Orientation</option>
-        <option value="Social Sciences / History / Geography">Social Sciences / History / Geography</option>
-        <option value="Arts / Culture / Creative Learning">Arts / Culture / Creative Learning</option>
-        <option value="Engineering / Technology / Built Environment">Engineering / Technology / Built Environment</option>
-        <option value="Law / Legal Studies">Law / Legal Studies</option>
-        <option value="Business / Commerce / Management">Business / Commerce / Management</option>
-        <option value="Health / Life Sciences">Health / Life Sciences</option>
-        <option value="Computer / Digital Skills">Computer / Digital Skills</option>
-        <option value="Agriculture / Environment">Agriculture / Environment</option>
-        <option value="Artisan / Trade Skills">Artisan / Trade Skills</option>
-        <option value="Other / My Own">Other / My Own Learning Area</option>
-      </select>
-      <input type="text" id="customLearningArea" maxlength="80" placeholder="Type your own subject / learning area" style="display:none;">
-
-      <input type="text" id="lessonTitle" placeholder="Subject / Topic / Module (e.g. Fractions, Electrical N2, Contract Law)">
-      <textarea id="lessonNotes" placeholder="Key ideas, formulas, page notes, teacher/tutor notes, or your own summary..."></textarea>
+      <input type="text" id="lessonTitle" maxlength="160" placeholder="Lesson / lecture / textbook section / topic">
+      <textarea id="lessonNotes" placeholder="Capture the important points here, or add your own notes and summary..."></textarea>
 
       <div class="btn-grid">
         <label class="btn btn-photo">
@@ -268,7 +239,7 @@
     <!-- SAVED LESSONS & SEARCH -->
     <section class="card section-anchor" id="librarySection">
       <h2>📚 My Learning</h2>
-      <input type="text" id="searchInput" placeholder="🔍 Search subject, topic, formula, or notes..." oninput="filterLessons()">
+      <input type="text" id="searchInput" placeholder="🔍 Search your saved learning..." oninput="filterLessons()">
       <div class="btn-grid">
         <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
         <label class="btn" style="background:#475569;color:white;">♻️ Restore Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
@@ -299,15 +270,6 @@
   </div>
 
   <script>
-    function toggleCustomLearningArea() {
-      const select = document.getElementById('facultySelect');
-      const custom = document.getElementById('customLearningArea');
-      if (!select || !custom) return;
-      const show = select.value === 'Other / My Own';
-      custom.style.display = show ? 'block' : 'none';
-      if (show) custom.focus();
-    }
-
     function goToSection(id) {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
@@ -497,10 +459,8 @@
         return;
       }
       const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Learning';
-      const selectedArea = document.getElementById('facultySelect').value;
-      const customArea = document.getElementById('customLearningArea').value.trim();
-      const faculty = selectedArea === 'Other / My Own' ? (customArea || 'Other / My Own') : selectedArea;
-      const stage = document.getElementById('stageSelect').value;
+      const faculty = 'Learning';
+      const stage = '';
       const notes = document.getElementById('lessonNotes').value.trim();
       const record = {
         title, faculty, stage, notes,
@@ -559,7 +519,7 @@
         div.className = 'lesson-card';
         div.innerHTML = `
           <div class="lesson-meta">
-            <span class="faculty-tag">${escapeHTML(l.stage ? l.stage + ' • ' : '')}${escapeHTML(l.faculty)}</span>
+            <span class="faculty-tag">Saved Offline</span>
             <span style="color:var(--text-muted); font-size:0.75rem;">${escapeHTML(l.date)}</span>
           </div>
           <div class="lesson-title">${escapeHTML(l.title)}</div>
@@ -579,8 +539,6 @@
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allLessonsCache.filter(l => 
         l.title.toLowerCase().includes(q) ||
-        l.faculty.toLowerCase().includes(q) ||
-        (l.stage && l.stage.toLowerCase().includes(q)) ||
         (l.notes && l.notes.toLowerCase().includes(q))
       );
       renderLessons(filtered);
@@ -590,7 +548,7 @@
     function openStudyModal(id) {
       const lesson = allLessonsCache.find(l => l.id === Number(id));
       if (!lesson) return;
-      document.getElementById('modalFaculty').textContent = (lesson.stage ? lesson.stage + ' • ' : '') + lesson.faculty;
+      document.getElementById('modalFaculty').textContent = 'Saved Offline';
       document.getElementById('modalTitle').textContent = lesson.title;
       document.getElementById('modalDate').textContent = 'Captured: ' + lesson.date;
       document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes saved.';
