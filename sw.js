@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fundipocket-field-v1';
+const CACHE_NAME = 'fundipocket-distinctive-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
