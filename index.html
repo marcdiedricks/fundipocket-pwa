@@ -538,33 +538,29 @@ nso:{language:'LELEME',light:'Seetša',dark:'Leswiswi',offlineReady:'KA NTLE GA 
 };
 let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
 let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
-function setTxt(sel,txt){const e=document.querySelector(sel);if(e)e.textContent=txt;}
-function applyLanguageToInterface(){
- const d=uiTranslations[currentLanguage]||uiTranslations.en; const s=systemTranslations[currentLanguage]||systemTranslations.en;
- document.documentElement.lang=currentLanguage;
- const languageLabel=document.querySelector('section[aria-label="Language and learning mode"] > div:first-child'); if(languageLabel) languageLabel.textContent=s.language;
- const tele=document.querySelector('.telemetry-card'); if(tele){const ds=tele.querySelectorAll(':scope > div'); if(ds[0])ds[0].childNodes[0].nodeValue=s.storagePool+' '; if(ds[1])ds[1].childNodes[0].nodeValue=s.safeQuota+' ';}
- setTxt('#brandTagline',d.tag); setTxt('#captureHeading',d.capture); setTxt('#packHeading',d.pack); setTxt('#libraryHeading',d.library);
- document.querySelectorAll('.bento-tile').forEach((e,i)=>{const s=e.querySelector('strong'),m=e.querySelector('small');if(s)s.textContent=d.tiles[i];if(m)m.textContent=d.tileHelp[i];});
- const cap=document.querySelector('#captureSection > p'); if(cap)cap.textContent=d.captureIntro;
- const title=document.getElementById('lessonTitle'),notes=document.getElementById('lessonNotes'),search=document.getElementById('searchInput');
- if(title)title.placeholder=d.titlePh;if(notes)notes.placeholder=d.notesPh;if(search)search.placeholder=d.search;
- const capBtns=document.querySelectorAll('#captureSection .btn-grid:first-of-type .btn'); if(capBtns[0])capBtns[0].textContent=d.paste;if(capBtns[1])capBtns[1].textContent=d.type;
- setTxt('#pasteHelp',d.pasteHelp);
- const mediaBtns=document.querySelectorAll('#captureSection .btn-grid:nth-of-type(2) .btn'); if(mediaBtns[0]){const inp=mediaBtns[0].querySelector('input');mediaBtns[0].textContent=d.photo;if(inp)mediaBtns[0].appendChild(inp);} if(mediaBtns[1])mediaBtns[1].textContent=d.audio;
- const cs=document.getElementById('captureSummary'); if(cs)cs.innerHTML=d.photos+' <span id="photoCountBadge">'+queuedPhotos.length+'</span>/5 | '+d.audioLabel+' <span id="audioStatusBadge">'+(recordedAudioBlob?'✓':d.none)+'</span>';
- const saveBtn=document.querySelector('#captureSection > .btn-save');if(saveBtn)saveBtn.textContent=d.make;
- const pe=document.getElementById('packEmpty');if(pe)pe.textContent=d.packEmpty;
- const pc=document.getElementById('packContent');if(pc){const heads=pc.querySelectorAll('div[style*="font-weight:900"]');if(heads[0])heads[0].textContent=d.yourSummary;if(heads[1])heads[1].textContent=d.check;const help=pc.querySelector('div[style*="font-size:.8rem"]');if(help)help.textContent=d.checkHelp;const ans=pc.querySelector('button');if(ans)ans.textContent=d.answers;}
- const libBtns=document.querySelectorAll('#librarySection .btn-grid .btn');if(libBtns[0])libBtns[0].textContent=d.backup;if(libBtns[1]){const inp=libBtns[1].querySelector('input');libBtns[1].textContent=d.restore;if(inp)libBtns[1].appendChild(inp);}
- const libHelp=document.querySelector('#librarySection .btn-grid + div');if(libHelp)libHelp.textContent=d.restoreHelp;
- document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
- updateLearningModeUI(); updateThemeButtonLabel(document.documentElement.getAttribute('data-theme')||'dark');
- if(db) renderLessons(allLessonsCache);
+function setLanguage(lang){
+  currentLanguage=uiTranslations[lang]?lang:'en';
+  localStorage.setItem('fundipocket_lang',currentLanguage);
+  const d=uiTranslations[currentLanguage];
+  document.documentElement.lang=currentLanguage;
+  document.getElementById('brandTagline').textContent=d.tag;
+  document.getElementById('captureHeading').textContent=d.capture;
+  document.getElementById('packHeading').textContent=d.pack;
+  document.getElementById('libraryHeading').textContent=d.library;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
+  updateLearningModeUI();
 }
-function setLanguage(lang){currentLanguage=uiTranslations[lang]?lang:'en';localStorage.setItem('fundipocket_lang',currentLanguage);applyLanguageToInterface();}
-function updateLearningModeUI(){const d=uiTranslations[currentLanguage]||uiTranslations.en;const online=learningMode==='online';document.getElementById('modeToggleBtn').textContent=online?d.online:d.offline;document.getElementById('modeHelp').textContent=online?d.onlineHelp:d.offlineHelp;}
-function toggleLearningMode(){learningMode=learningMode==='offline'?'online':'offline';localStorage.setItem('fundipocket_mode',learningMode);updateLearningModeUI();}
+function updateLearningModeUI(){
+  const d=uiTranslations[currentLanguage]||uiTranslations.en;
+  const online=learningMode==='online';
+  document.getElementById('modeToggleBtn').textContent=online?d.online:d.offline;
+  document.getElementById('modeHelp').textContent=online?d.onlineHelp:d.offlineHelp;
+}
+function toggleLearningMode(){
+  learningMode=learningMode==='offline'?'online':'offline';
+  localStorage.setItem('fundipocket_mode',learningMode);
+  updateLearningModeUI();
+}
 setLanguage(currentLanguage);
     /* OFFLINE LEARNING PACK — captured text only; no network call */
     let currentQuiz = [];
