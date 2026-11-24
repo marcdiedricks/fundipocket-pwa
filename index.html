@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FundiPocket — Offline Student Toolkit</title>
+  <title>FundiPocket — Offline Learning Companion</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
     /* DYNAMIC THEME PALETTES */
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --card-alt: #0b1329;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --input-bg: #0f172a;
-      --accent: #10b981;
-      --accent-hover: #059669;
-      --highlight: #2563eb;
+      --bg: #f6fbff;
+      --card-bg: #ffffff;
+      --card-alt: #eef8ff;
+      --text: #17324d;
+      --text-muted: #62758a;
+      --border: #dcecf6;
+      --input-bg: #ffffff;
+      --accent: #17b890;
+      --accent-hover: #0f9f7b;
+      --highlight: #32a8ff;
       --danger: #ef4444;
-      --modal-bg: #0b1120;
+      --modal-bg: #f6fbff;
     }
 
     [data-theme="light"] {
@@ -39,12 +39,12 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; transition: background 0.2s ease, color 0.2s ease; }
+    body { background: linear-gradient(180deg,#e9f9ff 0,#fff8e8 45%,#f8f3ff 100%); color: var(--text); padding: 16px; display: flex; justify-content: center; transition: background 0.2s ease, color 0.2s ease; }
     .container { width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 16px; }
 
     /* HEADER */
     header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    .brand h1 { font-size: 1.4rem; color: var(--accent); font-weight: 800; }
+    .brand h1 { font-size: 1.55rem; color: #1367d1; font-weight: 900; letter-spacing:-.02em; }
     .brand p { font-size: 0.75rem; color: var(--text-muted); }
     
     .theme-btn {
@@ -86,8 +86,22 @@
       display: block;
     }
 
+    /* BENTO / METRO HOME ACTIONS */
+    .bento-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .bento-tile { min-height:96px; border:1px solid var(--border); border-radius:18px; background:linear-gradient(145deg,#ffffff,#eef9ff); color:var(--text); padding:14px; display:flex; flex-direction:column; justify-content:space-between; text-align:left; cursor:pointer; }
+    .bento-tile strong { font-size:1rem; }
+    .bento-tile small { color:var(--text-muted); line-height:1.25; }
+    .bento-icon { font-size:1.45rem; }
+    .status-strip { display:flex; gap:6px; flex-wrap:wrap; font-size:.72rem; }
+    .status-pill { border:1px solid var(--border); background:var(--card-alt); border-radius:999px; padding:5px 8px; color:var(--text-muted); }
+    .status-pill.ok { color:var(--accent); }
+    .section-anchor { scroll-margin-top:12px; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label:focus-within { outline:3px solid var(--accent); outline-offset:2px; }
+    @media (max-width:360px) { .bento-grid { grid-template-columns:1fr; } .lesson-actions { grid-template-columns:1fr 1fr; } }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important; animation:none !important; transition:none !important; } }
+
     /* CARDS & INPUTS */
-    .card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card { background: var(--card-bg); border-radius: 18px; box-shadow:0 8px 24px rgba(36,93,138,.08); border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .card h2 { font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
 
     input, select, textarea {
@@ -103,6 +117,7 @@
 
     .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn {
+      min-height: 46px;
       padding: 10px;
       border: none;
       border-radius: 6px;
@@ -166,12 +181,25 @@
     <header>
       <div class="brand">
         <h1>FundiPocket</h1>
-        <p>Offline Tertiary Knowledge Hub • Zero-Data PWA</p>
+        <p>Offline-First Learning Companion • Built for Low-Data Environments</p>
       </div>
       <button class="theme-btn" id="themeToggleBtn" onclick="toggleAppTheme()">
         🌙 Dark
       </button>
     </header>
+
+    <!-- SIMPLE BENTO HOME: core actions stay available without a heavy framework -->
+    <nav class="bento-grid" aria-label="FundiPocket learning actions">
+      <button class="bento-tile" onclick="goToSection('captureSection')"><span class="bento-icon">📥</span><strong>CAPTURE</strong><small>Bring a lesson, lecture, page or notes into your pocket</small></button>
+      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">✨</span><strong>SUMMARY</strong><small>Turn captured text into a clear revision summary</small></button>
+      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">🎯</span><strong>CHECK MY KNOWLEDGE</strong><small>A short, friendly check from what you captured</small></button>
+      <button class="bento-tile" onclick="goToSection('librarySection')"><span class="bento-icon">📚</span><strong>MY POCKET</strong><small>Open saved learning, even offline</small></button>
+    </nav>
+    <div class="status-strip" aria-label="App status">
+      <span class="status-pill ok" id="offlineReadyPill">OFFLINE READY: CHECKING</span>
+      <span class="status-pill ok" id="localStoragePill">LOCAL STORAGE: CHECKING</span>
+      <span class="status-pill" id="networkPill">NETWORK: CHECKING</span>
+    </div>
 
     <!-- STORAGE TELEMETRY & IMPORT -->
     <div class="telemetry-card">
@@ -179,49 +207,53 @@
       <div>Safe Quota: <span class="badge-quota" id="storageQuota">10240 MB</span></div>
     </div>
 
-    <label class="import-btn-label">
-      📥 Import Shared Lesson (.html)
+    <label class="import-btn-label" style="display:none;">
+      📥 Receive Shared Learning (.html)
       <input type="file" accept=".html,text/html" id="importFileInput" style="display:none;" onchange="importSharedLesson(event)">
     </label>
 
     <!-- CAPTURE FORM -->
-    <section class="card">
-      <h2>✍️ Capture Lecture Unit</h2>
+    <section class="card section-anchor" id="captureSection">
+      <h2>📥 Capture your learning</h2>
+      <p style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">While you have access to the lesson, lecture, textbook or notes, put the useful learning here. FundiPocket keeps it on this phone for later.</p>
       
-      <select id="facultySelect">
-        <option value="General Studies">General Studies / All Faculties</option>
-        <option value="Engineering & Built Environment">Engineering & Built Environment</option>
-        <option value="Law & Legal Studies">Law & Legal Studies</option>
-        <option value="Commerce & Management">Commerce & Management</option>
-        <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
-        <option value="Health Sciences">Health Sciences</option>
-        <option value="Science & Technology">Science & Technology</option>
-      </select>
-
-      <input type="text" id="lessonTitle" placeholder="Lecture Topic / Code (e.g. Contract Law 101)">
-      <textarea id="lessonNotes" placeholder="Key formulas, whiteboard summary, or lecturer notes..."></textarea>
+      <input type="text" id="lessonTitle" maxlength="160" placeholder="Lesson / lecture / textbook section / topic">
+      <textarea id="lessonNotes" placeholder="Type or paste the lesson text or notes here. The more useful text you capture, the better your offline summary and knowledge check."></textarea>
 
       <div class="btn-grid">
         <label class="btn btn-photo">
-          📷 Snap Slide/Board
+          📷 Capture Board / Page
           <input type="file" accept="image/*" capture="environment" id="photoCaptureInput" style="display:none;" onchange="handlePhotoCapture(event)">
         </label>
         <button class="btn btn-audio" id="audioRecordBtn" onclick="toggleAudioRecording()">
-          🎙️ Record Audio
+          🎙️ Record Learning Audio
         </button>
       </div>
 
       <div id="captureSummary" style="font-size:0.75rem; color:var(--text-muted);">
-        Photos queued: <span id="photoCountBadge">0</span> | Audio: <span id="audioStatusBadge">None</span>
+        Photos queued: <span id="photoCountBadge">0</span>/5 | Audio: <span id="audioStatusBadge">None</span>
       </div>
 
-      <button class="btn btn-save" onclick="saveActiveLesson()">💾 Save Lesson to Local Library</button>
+      <button class="btn btn-save" onclick="buildLearningPack()">✨ Make My Learning Pack</button>
+    </section>
+
+    <section class="card section-anchor" id="learningPackSection">
+      <h2>✨ My Learning Pack</h2>
+      <div id="packEmpty" style="font-size:.86rem;color:var(--text-muted);line-height:1.5;">Capture lesson text above, then tap <strong>Make My Learning Pack</strong>. Your summary and short knowledge check will appear here.</div>
+      <div id="packContent" style="display:none;">
+        <div style="background:#eaf9f4;border:1px solid #bdebdc;border-radius:16px;padding:14px;margin-bottom:12px;"><div style="font-weight:900;color:#087f63;margin-bottom:8px;">🌟 Your Summary</div><div id="generatedSummary" style="line-height:1.6;white-space:pre-wrap;"></div></div>
+        <div style="background:#fff7dc;border:1px solid #ffe49a;border-radius:16px;padding:14px;"><div style="font-weight:900;color:#9a6500;margin-bottom:4px;">🎯 Check My Knowledge</div><div style="font-size:.8rem;color:#7b6a42;margin-bottom:10px;">A quick check — not an exam. Use the summary if you need help.</div><div id="quizArea"></div><button class="btn" style="background:#9b7bff;color:white;width:100%;margin-top:10px;" onclick="checkKnowledge()">🎉 Check My Answers</button><div id="quizResult" style="margin-top:10px;font-weight:800;"></div></div>
+      </div>
     </section>
 
     <!-- SAVED LESSONS & SEARCH -->
-    <section class="card">
-      <h2>📚 Saved Lessons Library</h2>
-      <input type="text" id="searchInput" placeholder="🔍 Search topic, formula, or faculty..." oninput="filterLessons()">
+    <section class="card section-anchor" id="librarySection">
+      <h2>📚 My Learning</h2>
+      <input type="text" id="searchInput" placeholder="🔍 Search your saved learning..." oninput="filterLessons()">
+      <div class="btn-grid">
+        <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
+        <label class="btn" style="background:#475569;color:white;">♻️ Restore Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
+      </div>
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
         <!-- Dynamic Cards -->
       </div>
@@ -231,23 +263,47 @@
   <!-- FULLSCREEN STUDY READER MODAL -->
   <div id="studyModal">
     <div class="modal-header">
-      <span class="faculty-tag" id="modalFaculty">Faculty</span>
+      <span class="faculty-tag" id="modalFaculty">Learning Area</span>
       <button class="modal-close" onclick="closeStudyModal()">✕ Close</button>
     </div>
-    <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Lecture Title</h1>
+    <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Learning Topic</h1>
     <div style="font-size:0.8rem; color:var(--text-muted);" id="modalDate">Captured Date</div>
     <div id="modalAudioSection"></div>
     <div class="card" style="margin-top:8px;">
-      <h3 style="font-size:0.95rem; color:var(--accent);">Whiteboard Slides</h3>
+      <h3 style="font-size:0.95rem; color:var(--accent);">Board / Page / Note Photos</h3>
       <div id="modalImagesContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
     </div>
+    <div class="card"><h3 style="font-size:0.95rem;color:#087f63;">✨ Summary</h3><p id="modalSummaryText" style="font-size:.95rem;line-height:1.6;white-space:pre-wrap;"></p></div>
     <div class="card">
-      <h3 style="font-size:0.95rem; color:var(--accent);">Notes & Formulas</h3>
+      <h3 style="font-size:0.95rem; color:var(--accent);">Captured Learning</h3>
       <p id="modalNotesText" style="font-size:0.95rem; line-height:1.6; white-space:pre-wrap;"></p>
     </div>
   </div>
 
   <script>
+    function goToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    }
+    window.addEventListener('load', () => {
+      const pill = document.getElementById('offlineReadyPill');
+      if (!pill) return;
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE SHELL: READY'; }).catch(() => { pill.textContent = 'OFFLINE SHELL: CHECK'; });
+      } else {
+        pill.textContent = 'OFFLINE SHELL: LIMITED';
+      }
+      updateNetworkPill();
+    });
+    function updateNetworkPill() {
+      const p = document.getElementById('networkPill');
+      if (!p) return;
+      p.textContent = navigator.onLine ? 'NETWORK: AVAILABLE' : 'NETWORK: OFFLINE';
+      p.classList.toggle('ok', !navigator.onLine);
+    }
+    window.addEventListener('online', updateNetworkPill);
+    window.addEventListener('offline', updateNetworkPill);
+
     /* THEME SWITCHER ENGINE */
     function initTheme() {
       const saved = localStorage.getItem('fundi_theme') || 'dark';
@@ -274,6 +330,7 @@
     let recordedAudioBlob = null;
     let mediaRecorder = null;
     let audioChunks = [];
+    let audioStopTimer = null;
     let allLessonsCache = [];
 
     const dbReq = indexedDB.open("FundiPocketDB", 2);
@@ -285,9 +342,22 @@
     };
     dbReq.onsuccess = (e) => {
       db = e.target.result;
+      const storagePill = document.getElementById('localStoragePill');
+      if (storagePill) storagePill.textContent = 'LOCAL STORAGE: READY';
       refreshTelemetry();
       loadLessons();
     };
+    dbReq.onerror = () => {
+      alert('FundiPocket could not open local storage. Your device may be low on storage or private browsing may be blocking offline saving.');
+    };
+
+    /* ASK SUPPORTED BROWSERS TO REDUCE AUTOMATIC EVICTION OF OFFLINE LEARNING */
+    async function requestPersistentStorage() {
+      try {
+        if (navigator.storage && navigator.storage.persist) await navigator.storage.persist();
+      } catch (e) {}
+    }
+    requestPersistentStorage();
 
     /* STORAGE ESTIMATION */
     async function refreshTelemetry() {
@@ -304,6 +374,16 @@
     function handlePhotoCapture(event) {
       const file = event.target.files[0];
       if (!file) return;
+      if (queuedPhotos.length >= 5) {
+        alert('You can attach up to 5 photos to one learning item. Save this item, then start another if you need more.');
+        event.target.value = '';
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        alert('This shared file is larger than 8 MB. For low-storage phones, ask the sender for a smaller learning bundle.');
+        event.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -326,8 +406,13 @@
           }
           ctx.putImageData(imgData, 0, 0);
           canvas.toBlob((blob) => {
+            if (!blob) {
+              alert('This photo could not be prepared. Please try another photo.');
+              return;
+            }
             queuedPhotos.push(blob);
             document.getElementById('photoCountBadge').textContent = queuedPhotos.length;
+            event.target.value = '';
           }, 'image/webp', 0.65);
         };
         img.src = e.target.result;
@@ -341,20 +426,36 @@
       if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
         btn.classList.remove('recording');
-        btn.textContent = '🎙️ Record Audio';
+        btn.textContent = '🎙️ Record Learning Audio';
         return;
       }
       try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+          alert('Audio recording is not supported on this device/browser. You can still save notes and photos offline.');
+          return;
+        }
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+        try {
+          mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 16000 });
+        } catch (e) {
+          mediaRecorder = new MediaRecorder(stream);
+        }
         mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
+          if (audioStopTimer) { clearTimeout(audioStopTimer); audioStopTimer = null; }
           recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           document.getElementById('audioStatusBadge').textContent = `${(recordedAudioBlob.size / 1024).toFixed(0)} KB ready`;
           stream.getTracks().forEach(t => t.stop());
         };
         mediaRecorder.start();
+        audioStopTimer = setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            btn.textContent = '🎙️ Record Learning Audio';
+          }
+        }, 10 * 60 * 1000);
         btn.classList.add('recording');
         btn.textContent = '⏹️ Stop Recording';
       } catch (err) {
@@ -362,29 +463,94 @@
       }
     }
 
+    /* OFFLINE LEARNING PACK — captured text only; no network call */
+    let currentQuiz = [];
+    function normaliseWords(text) {
+      const stop = ['that','this','with','from','have','were','been','they','their','there','what','when','where','which','would','could','should','about','into','your','then','than','also','only','some','more','most','very','because','lesson','notes'];
+      return (text.toLowerCase().match(/[a-zà-ž][a-zà-ž'-]{3,}/gi) || []).filter(w => !stop.includes(w));
+    }
+    function makeOfflineSummary(text) {
+      const clean = text.replace(/\s+/g,' ').trim();
+      const sentences = clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+      if (!sentences.length) return '';
+      const freq = {}; normaliseWords(clean).forEach(w => freq[w]=(freq[w]||0)+1);
+      const ranked = sentences.map((s,i)=>({s:s.trim(),i,score:normaliseWords(s).reduce((n,w)=>n+(freq[w]||0),0)/Math.max(1,s.length/35)})).filter(x=>x.s.length>20).sort((a,b)=>b.score-a.score).slice(0,Math.min(5,Math.max(2,Math.ceil(sentences.length*.35)))).sort((a,b)=>a.i-b.i);
+      return ranked.length ? ranked.map(x=>'• '+x.s).join('\n') : '• '+clean;
+    }
+    function makeKnowledgeCheck(text) {
+      const sentences=(text.replace(/\s+/g,' ').trim().match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).filter(s=>s.trim().length>28);
+      const words=normaliseWords(text), freq={}; words.forEach(w=>freq[w]=(freq[w]||0)+1);
+      const keys=Object.keys(freq).sort((a,b)=>freq[b]-freq[a] || b.length-a.length), out=[];
+      for (const sentence of sentences) {
+        const lower=sentence.toLowerCase();
+        const key=keys.find(k=>lower.includes(k.toLowerCase()) && !out.some(q=>q.answer.toLowerCase()===k.toLowerCase()));
+        if (!key) continue;
+        const pos=lower.indexOf(key.toLowerCase());
+        const question=sentence.slice(0,pos)+'________'+sentence.slice(pos+key.length);
+        out.push({question:question.trim(),answer:key});
+        if(out.length===3) break;
+      }
+      return out;
+    }
+    function buildLearningPack() {
+      const text=document.getElementById('lessonNotes').value.trim();
+      if(text.length<80){ alert('Add a little more of the lesson text or notes first so FundiPocket has enough material to make a useful learning pack.'); return; }
+      const summary=makeOfflineSummary(text); currentQuiz=makeKnowledgeCheck(text);
+      document.getElementById('generatedSummary').textContent=summary;
+      const area=document.getElementById('quizArea'); area.innerHTML='';
+      currentQuiz.forEach((q,i)=>{ const wrap=document.createElement('div'); wrap.style.margin='10px 0'; const label=document.createElement('div'); label.style.cssText='font-weight:700;line-height:1.45;margin-bottom:6px'; label.textContent=(i+1)+'. '+q.question; const input=document.createElement('input'); input.id='quizAnswer'+i; input.placeholder='Your answer'; input.autocomplete='off'; wrap.append(label,input); area.appendChild(wrap); });
+      if(!currentQuiz.length) area.innerHTML='<div style="font-size:.85rem;color:var(--text-muted)">Your summary is ready. Add a little more detailed lesson text to create the knowledge check.</div>';
+      document.getElementById('packEmpty').style.display='none'; document.getElementById('packContent').style.display='block'; document.getElementById('quizResult').textContent='';
+      saveActiveLesson(summary,currentQuiz); goToSection('learningPackSection');
+    }
+    function checkKnowledge(){
+      if(!currentQuiz.length)return; let correct=0;
+      currentQuiz.forEach((q,i)=>{ const input=document.getElementById('quizAnswer'+i), a=input.value.trim().toLowerCase(), target=q.answer.toLowerCase(); const ok=a && (a===target || target.includes(a) || a.includes(target)); input.style.borderColor=ok?'#17b890':'#ff8a72'; input.style.background=ok?'#effcf7':'#fff4f1'; if(ok)correct++; });
+      const r=document.getElementById('quizResult'); r.textContent=correct===currentQuiz.length?'🌟 Brilliant — you’ve got this lesson!':correct>0?'👏 Good start — '+correct+' of '+currentQuiz.length+' key ideas found. Revisit the summary and try again.':'💡 Have another look at your summary, then try again. That is what revision is for.';
+    }
+
     /* SAVE LESSON */
-    function saveActiveLesson() {
-      const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Lecture';
-      const faculty = document.getElementById('facultySelect').value;
+    function saveActiveLesson(summary = '', quiz = []) {
+      if (!db) {
+        alert('Local storage is not ready yet. Please wait a moment and try again.');
+        return;
+      }
+      const title = document.getElementById('lessonTitle').value.trim() || 'Untitled Learning';
+      const faculty = 'Learning';
+      const stage = '';
       const notes = document.getElementById('lessonNotes').value.trim();
       const record = {
-        title, faculty, notes,
+        title, faculty, stage, notes, summary, quiz,
         photos: queuedPhotos,
         audio: recordedAudioBlob,
         date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
       };
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').add(record);
+      tx.onerror = () => {
+        alert('This learning item could not be saved. Please free some device storage and try again.');
+      };
+      tx.onabort = () => {
+        alert('Saving was interrupted. Your current capture has not been cleared; please try again.');
+      };
       tx.oncomplete = () => {
         queuedPhotos = [];
         recordedAudioBlob = null;
         document.getElementById('lessonTitle').value = '';
-        document.getElementById('lessonNotes').value = '';
         document.getElementById('photoCountBadge').textContent = '0';
         document.getElementById('audioStatusBadge').textContent = 'None';
         refreshTelemetry();
         loadLessons();
       };
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     /* LOAD & DISPLAY */
@@ -401,7 +567,7 @@
       const container = document.getElementById('lessonsList');
       container.innerHTML = '';
       if (list.length === 0) {
-        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No lessons found in this view.</div>';
+        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:16px;">No saved learning found in this view.</div>';
         return;
       }
       list.forEach(l => {
@@ -409,11 +575,11 @@
         div.className = 'lesson-card';
         div.innerHTML = `
           <div class="lesson-meta">
-            <span class="faculty-tag">${l.faculty}</span>
-            <span style="color:var(--text-muted); font-size:0.75rem;">${l.date}</span>
+            <span class="faculty-tag">Saved Offline</span>
+            <span style="color:var(--text-muted); font-size:0.75rem;">${escapeHTML(l.date)}</span>
           </div>
-          <div class="lesson-title">${l.title}</div>
-          <div style="font-size:0.78rem; color:var(--text-muted);">${(l.notes || '').substring(0, 75)}...</div>
+          <div class="lesson-title">${escapeHTML(l.title)}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">${escapeHTML((l.notes || '').substring(0, 75))}...</div>
           <div class="lesson-actions">
             <button class="btn-action btn-read" onclick="openStudyModal(${l.id})">📖 Study</button>
             <button class="btn-action btn-share" onclick="shareLessonBundle(${l.id})">📲 Share</button>
@@ -429,7 +595,6 @@
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allLessonsCache.filter(l => 
         l.title.toLowerCase().includes(q) ||
-        l.faculty.toLowerCase().includes(q) ||
         (l.notes && l.notes.toLowerCase().includes(q))
       );
       renderLessons(filtered);
@@ -439,10 +604,11 @@
     function openStudyModal(id) {
       const lesson = allLessonsCache.find(l => l.id === Number(id));
       if (!lesson) return;
-      document.getElementById('modalFaculty').textContent = lesson.faculty;
+      document.getElementById('modalFaculty').textContent = 'Saved Offline';
       document.getElementById('modalTitle').textContent = lesson.title;
       document.getElementById('modalDate').textContent = 'Captured: ' + lesson.date;
-      document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes recorded.';
+      document.getElementById('modalNotesText').textContent = lesson.notes || 'No written notes saved.';
+      document.getElementById('modalSummaryText').textContent = lesson.summary || makeOfflineSummary(lesson.notes || '') || 'No summary saved.';
 
       const audioSec = document.getElementById('modalAudioSection');
       audioSec.innerHTML = '';
@@ -466,7 +632,7 @@
           imgSec.appendChild(img);
         });
       } else {
-        imgSec.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">No chalkboard photos attached.</span>';
+        imgSec.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">No board, page, or note photos attached.</span>';
       }
       document.getElementById('studyModal').classList.add('open');
     }
@@ -474,9 +640,49 @@
       document.getElementById('studyModal').classList.remove('open');
     }
 
+    /* PORTABLE LIBRARY BACKUP — text metadata only; media remains in per-item shared bundles */
+    function exportLibraryBackup() {
+      const safe = allLessonsCache.map(({id, audio, photos, ...item}) => ({ ...item, mediaNote: (audio || (photos && photos.length)) ? 'Media not included in lightweight library backup' : '' }));
+      const payload = { format: 'FundiPocketLibraryBackup', version: 1, exportedAt: new Date().toISOString(), items: safe };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'FundiPocket_Library_Backup.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function restoreLibraryBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Backup is too large for the lightweight restore tool.'); event.target.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || data.format !== 'FundiPocketLibraryBackup' || !Array.isArray(data.items)) throw new Error('Invalid backup');
+          if (!db) throw new Error('Storage not ready');
+          const tx = db.transaction('lessons', 'readwrite');
+          const store = tx.objectStore('lessons');
+          data.items.slice(0, 2000).forEach(item => store.add({
+            title: String(item.title || 'Restored Learning').slice(0,160),
+            faculty: String(item.faculty || 'General Studies').slice(0,120),
+            stage: String(item.stage || 'General / Lifelong Learning').slice(0,120),
+            notes: String(item.notes || '').slice(0,20000),
+            photos: [], audio: null,
+            date: String(item.date || new Date().toLocaleDateString('en-ZA')).slice(0,80)
+          }));
+          tx.oncomplete = () => { event.target.value=''; loadLessons(); refreshTelemetry(); alert('Library backup restored. Text learning has been added to this device.'); };
+          tx.onerror = () => alert('Restore failed. Check available storage and try again.');
+        } catch (e) { event.target.value=''; alert('This is not a valid FundiPocket library backup.'); }
+      };
+      reader.onerror = () => { event.target.value=''; alert('Backup file could not be read.'); };
+      reader.readAsText(file);
+    }
+
     /* DELETE */
     function deleteLesson(id) {
-      if (!confirm('Permanently delete this lesson unit from your device storage?')) return;
+      if (!confirm('Permanently delete this saved learning from your device?')) return;
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').delete(Number(id));
       tx.oncomplete = () => {
@@ -503,7 +709,7 @@
         });
       }
 
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${lesson.title}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${lesson.faculty}</span><h1>${lesson.title}</h1><p style="font-size:0.8rem;color:#94a3b8">${lesson.date}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${lesson.notes}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Tertiary Study Toolkit • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHTML(lesson.title)}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${escapeHTML(lesson.faculty)}</span><h1>${escapeHTML(lesson.title)}</h1><p style="font-size:0.8rem;color:#94a3b8">${escapeHTML(lesson.date)}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${escapeHTML(lesson.notes)}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
     }
 
     async function downloadLessonBundle(id) {
@@ -523,7 +729,7 @@
       const html = await buildStandaloneHTML(lesson);
       const file = new File([html], `${lesson.title.replace(/[^a-zA-Z0-9]/g, '_')}_lesson.html`, { type: 'text/html' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: lesson.title, text: 'Here is our offline lecture bundle from FundiPocket.' });
+        navigator.share({ files: [file], title: lesson.title, text: 'Here is offline learning shared from FundiPocket.' });
       } else {
         downloadLessonBundle(id);
       }
@@ -536,9 +742,9 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
-        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Lesson').trim();
-        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim();
-        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim();
+        const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim().slice(0, 160);
+        const faculty = (doc.querySelector('span') ? doc.querySelector('span').textContent : 'General Studies').trim().slice(0, 120);
+        const notes = (doc.querySelectorAll('.card p')[1] ? doc.querySelectorAll('.card p')[1].textContent : '').trim().slice(0, 20000);
         
         const tx = db.transaction('lessons', 'readwrite');
         tx.objectStore('lessons').add({
@@ -549,13 +755,27 @@
           audio: null,
           date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
         });
+        tx.onerror = () => alert('This shared learning could not be imported. Check available device storage and try again.');
         tx.oncomplete = () => {
-          alert(`Successfully imported: ${title}`);
+          event.target.value = '';
+          alert(`Imported successfully: ${title}`);
           refreshTelemetry();
           loadLessons();
         };
       };
+      reader.onerror = () => {
+        event.target.value = '';
+        alert('This shared file could not be read.');
+      };
       reader.readAsText(file);
+    }
+    /* OFFLINE PWA REGISTRATION */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.warn('FundiPocket offline service unavailable:', err);
+        });
+      });
     }
   </script>
 </body>
