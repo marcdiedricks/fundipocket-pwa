@@ -197,8 +197,8 @@
     </nav>
     <div class="status-strip" aria-label="App status">
       <span class="status-pill ok" id="offlineReadyPill">OFFLINE READY: CHECKING</span>
-      <span class="status-pill">LOCAL STORAGE</span>
-      <span class="status-pill">LOW-DATA</span>
+      <span class="status-pill ok" id="localStoragePill">LOCAL STORAGE: CHECKING</span>
+      <span class="status-pill" id="networkPill">NETWORK: CHECKING</span>
     </div>
 
     <!-- STORAGE TELEMETRY & IMPORT -->
@@ -316,11 +316,20 @@
       const pill = document.getElementById('offlineReadyPill');
       if (!pill) return;
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE READY'; }).catch(() => { pill.textContent = 'OFFLINE: CHECK SETUP'; });
+        navigator.serviceWorker.ready.then(() => { pill.textContent = 'OFFLINE SHELL: READY'; }).catch(() => { pill.textContent = 'OFFLINE SHELL: CHECK'; });
       } else {
-        pill.textContent = 'OFFLINE: LIMITED';
+        pill.textContent = 'OFFLINE SHELL: LIMITED';
       }
+      updateNetworkPill();
     });
+    function updateNetworkPill() {
+      const p = document.getElementById('networkPill');
+      if (!p) return;
+      p.textContent = navigator.onLine ? 'NETWORK: AVAILABLE' : 'NETWORK: OFFLINE';
+      p.classList.toggle('ok', !navigator.onLine);
+    }
+    window.addEventListener('online', updateNetworkPill);
+    window.addEventListener('offline', updateNetworkPill);
 
     /* THEME SWITCHER ENGINE */
     function initTheme() {
@@ -360,6 +369,8 @@
     };
     dbReq.onsuccess = (e) => {
       db = e.target.result;
+      const storagePill = document.getElementById('localStoragePill');
+      if (storagePill) storagePill.textContent = 'LOCAL STORAGE: READY';
       refreshTelemetry();
       loadLessons();
     };
