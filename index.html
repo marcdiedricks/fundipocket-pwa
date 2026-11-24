@@ -208,7 +208,7 @@
 
     <!-- LEARNER LANGUAGE + CONNECTIVITY MODE -->
     <section aria-label="Language and learning mode" style="background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:12px;box-shadow:0 8px 22px rgba(23,50,77,.08);">
-      <div style="font-size:.76rem;font-weight:900;color:var(--text-muted);margin-bottom:8px;">LANGUAGE</div>
+      <div style="font-size:.76rem;font-weight:900;color:var(--text-muted);margin-bottom:8px;" id="languageLabel">LANGUAGE</div>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;">
         <button class="btn lang-btn" data-lang="en" onclick="setLanguage('en')" style="padding:9px 11px;flex:1 1 28%;min-width:90px;">English</button>
         <button class="btn lang-btn" data-lang="af" onclick="setLanguage('af')" style="padding:9px 11px;flex:1 1 28%;min-width:90px;">Afrikaans</button>
@@ -224,10 +224,10 @@
 
     <!-- SIMPLE BENTO HOME: core actions stay available without a heavy framework -->
     <nav class="bento-grid" aria-label="FundiPocket learning actions">
-      <button class="bento-tile" onclick="goToSection('captureSection')"><span class="bento-icon">📥</span><strong>CAPTURE</strong><small>Bring a lesson, lecture, page or notes into your pocket</small></button>
-      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">✨</span><strong>SUMMARY</strong><small>Turn captured text into a clear revision summary</small></button>
-      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">🎯</span><strong>CHECK MY KNOWLEDGE</strong><small>A short, friendly check from what you captured</small></button>
-      <button class="bento-tile" onclick="goToSection('librarySection')"><span class="bento-icon">📚</span><strong>MY POCKET</strong><small>Open saved learning, even offline</small></button>
+      <button class="bento-tile" onclick="goToSection('captureSection')"><span class="bento-icon">📥</span><strong id="tile0Title">CAPTURE</strong><small id="tile0Help">Bring a lesson, lecture, page or notes into your pocket</small></button>
+      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">✨</span><strong id="tile1Title">SUMMARY</strong><small id="tile1Help">Turn captured text into a clear revision summary</small></button>
+      <button class="bento-tile" onclick="goToSection('learningPackSection')"><span class="bento-icon">🎯</span><strong id="tile2Title">CHECK MY KNOWLEDGE</strong><small id="tile2Help">A short, friendly check from what you captured</small></button>
+      <button class="bento-tile" onclick="goToSection('librarySection')"><span class="bento-icon">📚</span><strong id="tile3Title">MY POCKET</strong><small id="tile3Help">Open saved learning, even offline</small></button>
     </nav>
     <div class="status-strip" aria-label="App status">
       <span class="status-pill ok" id="offlineReadyPill">OFFLINE READY: CHECKING</span>
@@ -249,18 +249,18 @@
     <!-- CAPTURE FORM -->
     <section class="card section-anchor" id="captureSection">
       <h2 id="captureHeading">📥 Capture your learning</h2>
-      <p style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">Capture useful learning while you have access to it, then keep it on this phone for later. Use FundiPocket for school, further study, training, work or everyday learning.</p>
+      <p id="captureIntro" style="font-size:.86rem;color:var(--text-muted);line-height:1.45;">Capture useful learning while you have access to it, then keep it on this phone for later. Use FundiPocket for school, further study, training, work or everyday learning.</p>
       
       <input type="text" id="lessonTitle" maxlength="160" placeholder="Give this learning a short title">
       <textarea id="lessonNotes" placeholder="Type, paste or add the learning you want to keep. This can be from school, college, university, training, work or everyday life."></textarea>
       <div class="btn-grid">
-        <button class="btn" style="background:#7147d9;color:white;" onclick="pasteLearningText()">📋 Paste from Clipboard</button>
-        <button class="btn" style="background:#0b78e3;color:white;" onclick="focusLearningText()">⌨️ Type My Notes</button>
+        <button id="pasteBtn" class="btn" style="background:#7147d9;color:white;" onclick="pasteLearningText()">📋 Paste from Clipboard</button>
+        <button id="typeBtn" class="btn" style="background:#0b78e3;color:white;" onclick="focusLearningText()">⌨️ Type My Notes</button>
       </div>
       <div id="pasteHelp" style="font-size:.74rem;color:var(--text-muted);line-height:1.4;">You can also press and hold inside the notes box and choose <strong>Paste</strong>.</div>
 
       <div class="btn-grid">
-        <label class="btn btn-photo">
+        <label class="btn btn-photo" id="photoBtn">
           📷 Capture Board / Page
           <input type="file" accept="image/*" capture="environment" id="photoCaptureInput" style="display:none;" onchange="handlePhotoCapture(event)">
         </label>
@@ -273,7 +273,7 @@
         Photos queued: <span id="photoCountBadge">0</span>/5 | Audio: <span id="audioStatusBadge">None</span>
       </div>
 
-      <button class="btn btn-save" onclick="buildLearningPack()">✨ Make My Learning Pack</button>
+      <button class="btn btn-save" id="makePackBtn" onclick="buildLearningPack()">✨ Make My Learning Pack</button>
     </section>
 
     <section class="card section-anchor" id="learningPackSection">
@@ -281,7 +281,7 @@
       <div id="packEmpty" style="font-size:.86rem;color:var(--text-muted);line-height:1.5;">Capture lesson text above, then tap <strong>Make My Learning Pack</strong>. Your summary and short knowledge check will appear here.</div>
       <div id="packContent" style="display:none;">
         <div style="background:#eaf9f4;border:1px solid #bdebdc;border-radius:16px;padding:14px;margin-bottom:12px;"><div style="font-weight:900;color:#087f63;margin-bottom:8px;">🌟 Your Summary</div><div id="generatedSummary" style="line-height:1.6;white-space:pre-wrap;"></div></div>
-        <div style="background:#fff7dc;border:1px solid #ffe49a;border-radius:16px;padding:14px;"><div style="font-weight:900;color:#9a6500;margin-bottom:4px;">🎯 Check My Knowledge</div><div style="font-size:.8rem;color:#7b6a42;margin-bottom:10px;">A quick check — not an exam. Use the summary if you need help.</div><div id="quizArea"></div><button class="btn" style="background:#9b7bff;color:white;width:100%;margin-top:10px;" onclick="checkKnowledge()">🎉 Check My Answers</button><div id="quizResult" style="margin-top:10px;font-weight:800;"></div></div>
+        <div style="background:#fff7dc;border:1px solid #ffe49a;border-radius:16px;padding:14px;"><div style="font-weight:900;color:#9a6500;margin-bottom:4px;">🎯 Check My Knowledge</div><div style="font-size:.8rem;color:#7b6a42;margin-bottom:10px;">A quick check — not an exam. Use the summary if you need help.</div><div id="quizArea"></div><button class="btn" id="checkAnswersBtn" style="background:#9b7bff;color:white;width:100%;margin-top:10px;" onclick="checkKnowledge()">🎉 Check My Answers</button><div id="quizResult" style="margin-top:10px;font-weight:800;"></div></div>
       </div>
     </section>
 
@@ -290,10 +290,10 @@
       <h2 id="libraryHeading">📚 My Learning</h2>
       <input type="text" id="searchInput" placeholder="🔍 Search your saved learning..." oninput="filterLessons()">
       <div class="btn-grid">
-        <button class="btn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
-        <label class="btn" style="background:#475569;color:white;">♻️ Restore Saved Backup<input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
+        <button class="btn" id="backupBtn" style="background:var(--highlight);color:white;" onclick="exportLibraryBackup()">🧰 Backup Library</button>
+        <label class="btn" id="restoreBtn" style="background:#475569;color:white;"><span id="restoreBtnText">♻️ Restore Saved Backup</span><input type="file" accept=".json,application/json" id="backupRestoreInput" style="display:none;" onchange="restoreLibraryBackup(event)"></label>
       </div>
-      <div style="font-size:.72rem;color:var(--text-muted);line-height:1.4;">Restore opens your device Files. Choose <strong>FundiPocket_Library_Backup.json</strong> from Downloads or wherever you saved it.</div>
+      <div id="restoreHelp" style="font-size:.72rem;color:var(--text-muted);line-height:1.4;">Restore opens your device Files. Choose <strong>FundiPocket_Library_Backup.json</strong> from Downloads or wherever you saved it.</div>
       <div id="lessonsList" style="display:flex; flex-direction:column; gap:10px;">
         <!-- Dynamic Cards -->
       </div>
@@ -304,18 +304,18 @@
   <div id="studyModal">
     <div class="modal-header">
       <span class="faculty-tag" id="modalFaculty">Learning Area</span>
-      <button class="modal-close" onclick="closeStudyModal()">✕ Close</button>
+      <button class="modal-close" id="modalCloseBtn" onclick="closeStudyModal()">✕ Close</button>
     </div>
     <h1 class="lesson-title" id="modalTitle" style="font-size:1.4rem;">Learning Topic</h1>
     <div style="font-size:0.8rem; color:var(--text-muted);" id="modalDate">Captured Date</div>
     <div id="modalAudioSection"></div>
     <div class="card" style="margin-top:8px;">
-      <h3 style="font-size:0.95rem; color:var(--accent);">Board / Page / Note Photos</h3>
+      <h3 id="modalPhotosHeading" style="font-size:0.95rem; color:var(--accent);">Board / Page / Note Photos</h3>
       <div id="modalImagesContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
     </div>
-    <div class="card"><h3 style="font-size:0.95rem;color:#087f63;">✨ Summary</h3><p id="modalSummaryText" style="font-size:.95rem;line-height:1.6;white-space:pre-wrap;"></p></div>
+    <div class="card"><h3 id="modalSummaryHeading" style="font-size:0.95rem;color:#087f63;">✨ Summary</h3><p id="modalSummaryText" style="font-size:.95rem;line-height:1.6;white-space:pre-wrap;"></p></div>
     <div class="card">
-      <h3 style="font-size:0.95rem; color:var(--accent);">Captured Learning</h3>
+      <h3 id="modalCapturedHeading" style="font-size:0.95rem; color:var(--accent);">Captured Learning</h3>
       <p id="modalNotesText" style="font-size:0.95rem; line-height:1.6; white-space:pre-wrap;"></p>
     </div>
   </div>
@@ -536,17 +536,33 @@ nso:{language:'LELEME',light:'Seetša',dark:'Leswiswi',offlineReady:'KA NTLE GA 
 };
 let currentLanguage=localStorage.getItem('fundipocket_lang')||'en';
 let learningMode=localStorage.getItem('fundipocket_mode')||'offline';
+function applyVisibleTranslations(){
+ const d=uiTranslations[currentLanguage]||uiTranslations.en, s=systemTranslations[currentLanguage]||systemTranslations.en;
+ const txt=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+ txt('languageLabel',s.language); txt('brandTagline',d.tag); txt('captureHeading',d.capture); txt('packHeading',d.pack); txt('libraryHeading',d.library);
+ d.tiles.forEach((v,i)=>txt('tile'+i+'Title',v)); d.tileHelp.forEach((v,i)=>txt('tile'+i+'Help',v));
+ txt('captureIntro',d.captureIntro);
+ const title=document.getElementById('lessonTitle'),notes=document.getElementById('lessonNotes'),search=document.getElementById('searchInput');
+ if(title)title.placeholder=d.titlePh;if(notes)notes.placeholder=d.notesPh;if(search)search.placeholder=d.search;
+ txt('pasteBtn',d.paste);txt('typeBtn',d.type);txt('pasteHelp',d.pasteHelp);
+ const photo=document.getElementById('photoBtn');if(photo&&photo.firstChild)photo.firstChild.nodeValue=d.photo+' ';
+ txt('audioRecordBtn',d.audio);
+ const cs=document.getElementById('captureSummary');if(cs)cs.innerHTML=d.photos+' <span id="photoCountBadge">'+queuedPhotos.length+'</span>/5 | '+d.audioLabel+' <span id="audioStatusBadge">'+(recordedAudioBlob?'✓':d.none)+'</span>';
+ txt('makePackBtn',d.make);txt('packEmpty',d.packEmpty);txt('checkAnswersBtn',d.answers);
+ txt('backupBtn',d.backup);txt('restoreBtnText',d.restore);txt('restoreHelp',d.restoreHelp);
+ txt('modalCloseBtn',d.close);txt('modalPhotosHeading',d.photosHeading);txt('modalSummaryHeading',d.summaryHeading);txt('modalCapturedHeading',d.captured);
+ updateLearningModeUI();updateThemeButtonLabel(document.documentElement.getAttribute('data-theme')||'dark');updateNetworkPill();
+ const op=document.getElementById('offlineReadyPill');if(op)op.textContent=s.offlineReady;
+ const lp=document.getElementById('localStoragePill');if(lp&&db)lp.textContent=s.storageReady;
+ const tele=document.querySelector('.telemetry-card');if(tele){const rows=tele.children;if(rows[0]&&rows[0].firstChild)rows[0].firstChild.nodeValue=s.storagePool+' ';if(rows[1]&&rows[1].firstChild)rows[1].firstChild.nodeValue=s.safeQuota+' ';}
+ if(db)renderLessons(allLessonsCache);
+}
 function setLanguage(lang){
-  currentLanguage=uiTranslations[lang]?lang:'en';
-  localStorage.setItem('fundipocket_lang',currentLanguage);
-  const d=uiTranslations[currentLanguage];
-  document.documentElement.lang=currentLanguage;
-  document.getElementById('brandTagline').textContent=d.tag;
-  document.getElementById('captureHeading').textContent=d.capture;
-  document.getElementById('packHeading').textContent=d.pack;
-  document.getElementById('libraryHeading').textContent=d.library;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
-  updateLearningModeUI();
+ currentLanguage=uiTranslations[lang]?lang:'en';
+ localStorage.setItem('fundipocket_lang',currentLanguage);
+ document.documentElement.lang=currentLanguage;
+ document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLanguage));
+ applyVisibleTranslations();
 }
 function updateLearningModeUI(){
   const d=uiTranslations[currentLanguage]||uiTranslations.en;
