@@ -474,6 +474,15 @@
       };
     }
 
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     /* LOAD & DISPLAY */
     function loadLessons() {
       const tx = db.transaction('lessons', 'readonly');
@@ -496,11 +505,11 @@
         div.className = 'lesson-card';
         div.innerHTML = `
           <div class="lesson-meta">
-            <span class="faculty-tag">${l.stage ? l.stage + ' • ' : ''}${l.faculty}</span>
-            <span style="color:var(--text-muted); font-size:0.75rem;">${l.date}</span>
+            <span class="faculty-tag">${escapeHTML(l.stage ? l.stage + ' • ' : '')}${escapeHTML(l.faculty)}</span>
+            <span style="color:var(--text-muted); font-size:0.75rem;">${escapeHTML(l.date)}</span>
           </div>
-          <div class="lesson-title">${l.title}</div>
-          <div style="font-size:0.78rem; color:var(--text-muted);">${(l.notes || '').substring(0, 75)}...</div>
+          <div class="lesson-title">${escapeHTML(l.title)}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">${escapeHTML((l.notes || '').substring(0, 75))}...</div>
           <div class="lesson-actions">
             <button class="btn-action btn-read" onclick="openStudyModal(${l.id})">📖 Study</button>
             <button class="btn-action btn-share" onclick="shareLessonBundle(${l.id})">📲 Share</button>
@@ -591,7 +600,7 @@
         });
       }
 
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${lesson.title}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${lesson.faculty}</span><h1>${lesson.title}</h1><p style="font-size:0.8rem;color:#94a3b8">${lesson.date}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${lesson.notes}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHTML(lesson.title)}</title><style>body{background:#0f172a;color:#f8fafc;padding:16px;font-family:sans-serif;max-width:600px;margin:auto}.card{background:#1e293b;padding:16px;border-radius:8px;border:1px solid #334155;margin-bottom:14px}h1{color:#10b981;font-size:1.3rem}img{width:100%;border-radius:6px;margin-top:8px}audio{width:100%;margin-top:10px}</style></head><body><div class="card"><span style="background:#0284c7;color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem">${escapeHTML(lesson.faculty)}</span><h1>${escapeHTML(lesson.title)}</h1><p style="font-size:0.8rem;color:#94a3b8">${escapeHTML(lesson.date)}</p>${b64Audio ? `<audio controls src="${b64Audio}"></audio>` : ''}</div><div class="card"><h3>Notes</h3><p style="white-space:pre-wrap;font-size:0.9rem">${escapeHTML(lesson.notes)}</p></div><div class="card"><h3>Board Photos</h3>${b64Photos.map(src => `<img src="${src}">`).join('')}</div><footer style="text-align:center;font-size:0.75rem;color:#94a3b8">Captured via FundiPocket • Offline Learning Companion • fundipocket.marcdiedricks.workers.dev</footer></body></html>`;
     }
 
     async function downloadLessonBundle(id) {
