@@ -2,7 +2,9 @@ const CACHE_NAME = 'fundipocket-field-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './landing.html',
+  './qr.html'
 ];
 
 self.addEventListener('install', (event) => {
