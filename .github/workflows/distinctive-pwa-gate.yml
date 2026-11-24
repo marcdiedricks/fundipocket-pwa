@@ -1,0 +1,28 @@
+name: FundiPocket Distinctive PWA Gate
+on:
+  push:
+    branches: [work/distinctive-pwa-v1-20261124]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and syntax-check JavaScript
+        run: |
+          python3 -c "from pathlib import Path; s=Path('index.html').read_text(); js=s.rsplit('<script>',1)[1].split('</script>',1)[0]; Path('/tmp/fundi.js').write_text(js)"
+          node --check /tmp/fundi.js
+      - name: Verify core learning loop and no forbidden taxonomy
+        run: |
+          grep -q "function buildLearningPack" index.html
+          grep -q "function makeOfflineSummary" index.html
+          grep -q "function makeKnowledgeCheck" index.html
+          grep -q "function saveActiveLesson" index.html
+          grep -q "function toggleAudioRecording" index.html
+          grep -q "function handlePhotoCapture" index.html
+          ! grep -qi "Agriculture" index.html
+          ! grep -qi "Artisan" index.html
+      - name: Verify PWA shell files
+        run: |
+          test -s manifest.json
+          test -s sw.js
+          grep -q "serviceWorker.register" index.html
