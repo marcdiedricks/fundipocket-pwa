@@ -785,7 +785,7 @@ setLanguage(currentLanguage);
     /* PORTABLE LIBRARY BACKUP — text metadata only; media remains in per-item shared bundles */
     function exportLibraryBackup() {
       const safe = allLessonsCache.map(({id, audio, photos, ...item}) => ({ ...item, mediaNote: (audio || (photos && photos.length)) ? 'Media not included in lightweight library backup' : '' }));
-      const payload = { format: 'FundiPocketLibraryBackup', version: 1, exportedAt: new Date().toISOString(), items: safe };
+      const payload = { format: 'FundiPocketLibraryBackup', version: 1, product: 'EDU-024-FundiPocket', restoreMode: 'MERGE', exportedAt: new Date().toISOString(), items: safe };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -802,14 +802,13 @@ setLanguage(currentLanguage);
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
-          if (!data || data.format !== 'FundiPocketLibraryBackup' || !Array.isArray(data.items)) throw new Error('Invalid backup');
-          if (!db) throw new Error('Storage not ready');
-          const tx = db.transaction('lessons', 'readwrite');
-          const store = tx.objectStore('lessons');
-          data.items.slice(0, 2000).forEach(item => store.add({
+          if (!data || data.format !== 'FundiPocketLibraryBackup' || data.version !== 1 || !Array.isArray(data.items)) throw new Error('Invalid backup');
+          if (data.product && data.product !== 'EDU-024-FundiPocket') throw new Error('Wrong product');
+          if (data.restoreMode && data.restoreMode !== 'MERGE') throw new Error('Unsupported restore mode');
+          if (data.items.length > 2000 || data.items.some(item => !item || typeof item !== 'object' || Array.isArray(item))) throw new Error('Invalid backup items');
+          const prepared = data.items.map(item => ({
             title: String(item.title || 'Restored Learning').slice(0,160),
-            faculty: 'Learning',
-            stage: '',
+            faculty: 'Learning', stage: '',
             notes: String(item.notes || '').slice(0,20000),
             summary: String(item.summary || '').slice(0,12000),
             quiz: Array.isArray(item.quiz) ? item.quiz.slice(0,3).map(q => ({
@@ -819,6 +818,10 @@ setLanguage(currentLanguage);
             photos: [], audio: null,
             date: String(item.date || new Date().toLocaleDateString('en-ZA')).slice(0,80)
           }));
+          if (!db) throw new Error('Storage not ready');
+          const tx = db.transaction('lessons', 'readwrite');
+          const store = tx.objectStore('lessons');
+          prepared.forEach(item => store.add(item));
           tx.oncomplete = () => { event.target.value=''; loadLessons(); refreshTelemetry(); alert('Library backup restored. Text learning has been added to this device.'); };
           tx.onerror = () => alert('Restore failed. Check available storage and try again.');
         } catch (e) { event.target.value=''; alert('This is not a valid FundiPocket library backup.'); }
@@ -887,9 +890,11 @@ setLanguage(currentLanguage);
     function importSharedLesson(event) {
       const file = event.target.files[0];
       if (!file) return;
+      if (file.size > 2 * 1024 * 1024 || !/\.html?$/i.test(file.name || '')) { alert('This shared learning file is not a supported FundiPocket HTML file.'); event.target.value=''; return; }
       const reader = new FileReader();
       reader.onload = (e) => {
         const doc = new DOMParser().parseFromString(e.target.result, 'text/html');
+        if (doc.querySelector('parsererror') || !doc.querySelector('h1') || doc.querySelectorAll('.card p').length < 2) { event.target.value=''; alert('This shared file does not match the expected FundiPocket lesson structure.'); return; }
         const title = (doc.querySelector('h1') ? doc.querySelector('h1').textContent : 'Imported Learning').trim().slice(0, 160);
         const faculty = 'Learning';
         const paras = doc.querySelectorAll('.card p');
