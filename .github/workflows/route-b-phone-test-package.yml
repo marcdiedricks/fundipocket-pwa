@@ -1,0 +1,25 @@
+name: Route-B Multilingual Phone Test Package
+on:
+  push:
+    branches:
+      - sandbox/edu-024-route-b-admission
+    paths:
+      - '.github/workflows/route-b-phone-test-package.yml'
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Netlify Drop ZIP
+        run: |
+          mkdir -p dist
+          zip -j dist/FundiPocket_ROUTE_B_MULTILINGUAL_PHONE_TEST.zip index.html landing.html manifest.json qr.html sw.js
+          sha256sum dist/FundiPocket_ROUTE_B_MULTILINGUAL_PHONE_TEST.zip > dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FundiPocket_ROUTE_B_MULTILINGUAL_PHONE_TEST
+          path: |
+            dist/FundiPocket_ROUTE_B_MULTILINGUAL_PHONE_TEST.zip
+            dist/SHA256.txt
+          retention-days: 7
